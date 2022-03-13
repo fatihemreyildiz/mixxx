@@ -3,7 +3,6 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QInputDialog>
-
 #include "controllers/keyboard/keyboardeventfilter.h"
 #include "library/export/trackexportwizard.h"
 #include "library/library.h"
@@ -409,6 +408,14 @@ void BasePlaylistFeature::slotDeletePlaylist() {
     }
 
     int siblingId = getSiblingPlaylistIdOf(m_lastRightClickedIndex);
+
+    QMessageBox::StandardButton btn = QMessageBox::question(nullptr,
+            tr("Confirm Deletion"),
+            tr("Do you really want to delete this playlist?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (btn == QMessageBox::No) {
+            return;
+        }
 
     m_playlistDao.deletePlaylist(playlistId);
 
