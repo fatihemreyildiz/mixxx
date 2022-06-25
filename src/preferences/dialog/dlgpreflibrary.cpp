@@ -202,6 +202,19 @@ void DlgPrefLibrary::slotResetToDefaults() {
     checkBox_show_itunes->setChecked(true);
     checkBox_show_traktor->setChecked(true);
     checkBox_show_rekordbox->setChecked(true);
+    checkBox_show_auto_dj->setChecked(true);
+    checkBox_show_load_to->setChecked(true);
+    checkBox_show_playlist->setChecked(true);
+    checkBox_show_crate->setChecked(true);
+    checkBox_show_remove->setChecked(true);
+    checkBox_show_metadata->setChecked(true);
+    checkBox_show_reset->setChecked(true);
+    checkBox_show_bpm->setChecked(true);
+    checkBox_show_color->setChecked(true);
+    checkBox_show_file_browser->setChecked(true);
+    checkBox_show_properties->setChecked(true);
+    checkBox_show_search_related->setChecked(true);
+    checkBox_show_find_on_web->setChecked(true);
     checkBoxEditMetadataSelectedClicked->setChecked(kEditMetadataSelectedClickDefault);
     radioButton_dbclick_bottom->setChecked(false);
     radioButton_dbclick_top->setChecked(false);
@@ -243,6 +256,33 @@ void DlgPrefLibrary::slotUpdate() {
             ConfigKey("[Library]","ShowRekordboxLibrary"), true));
     checkBox_show_serato->setChecked(m_pConfig->getValue(
             ConfigKey("[Library]", "ShowSeratoLibrary"), true));
+
+    checkBox_show_auto_dj->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowAutoDJ"), true));
+    checkBox_show_load_to->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowLoadTo"), true));
+    checkBox_show_playlist->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowPlaylist"), true));
+    checkBox_show_crate->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowCrate"), true));
+    checkBox_show_remove->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowRemove"), true));
+    checkBox_show_metadata->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowMetadata"), true));
+    checkBox_show_reset->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowReset"), true));
+    checkBox_show_bpm->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowBPM"), true));
+    checkBox_show_color->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowColor"), true));
+    checkBox_show_file_browser->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowFileBrowser"), true));
+    checkBox_show_properties->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowProperties"), true));
+    checkBox_show_search_related->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "SearchRelated"), true));
+    checkBox_show_find_on_web->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "FindOnWeb"), true));
 
     switch (m_pConfig->getValue<int>(
             kTrackDoubleClickActionConfigKey,
@@ -425,6 +465,33 @@ void DlgPrefLibrary::slotApply() {
                 ConfigValue((int)checkBox_show_rekordbox->isChecked()));
     m_pConfig->set(ConfigKey("[Library]", "ShowSeratoLibrary"),
             ConfigValue((int)checkBox_show_serato->isChecked()));
+
+    m_pConfig->set(ConfigKey("[Library]", "ShowAutoDJ"),
+            ConfigValue((int)checkBox_show_auto_dj->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowLoadTo"),
+            ConfigValue((int)checkBox_show_load_to->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowPlaylist"),
+            ConfigValue((int)checkBox_show_playlist->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowCrate"),
+            ConfigValue((int)checkBox_show_crate->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowRemove"),
+            ConfigValue((int)checkBox_show_remove->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowMetadata"),
+            ConfigValue((int)checkBox_show_metadata->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowReset"),
+            ConfigValue((int)checkBox_show_reset->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowBPM"),
+            ConfigValue((int)checkBox_show_bpm->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowColor"),
+            ConfigValue((int)checkBox_show_color->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowFileBrowser"),
+            ConfigValue((int)checkBox_show_file_browser->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowProperties"),
+            ConfigValue((int)checkBox_show_properties->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "SearchRelated"),
+            ConfigValue((int)checkBox_show_search_related->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "FindOnWeb"),
+            ConfigValue((int)checkBox_show_find_on_web->isChecked()));
 
     int dbclick_status;
     if (radioButton_dbclick_bottom->isChecked()) {

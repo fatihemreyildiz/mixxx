@@ -453,6 +453,163 @@
    </item>
 
    <item>
+    <widget class="QGroupBox" name="groupBox_track_menu">
+     <property name="title">
+      <string>Track Menu</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_track_menu">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="checkBox_show_auto_dj">
+        <property name="text">
+         <string>Auto DJ</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkBox_show_load_to">
+        <property name="text">
+         <string>Load to</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="checkBox_show_playlist">
+        <property name="text">
+         <string>Playlist</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="checkBox_show_crate">
+        <property name="text">
+         <string>Crate</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="checkBox_show_remove">
+        <property name="text">
+         <string>Remove</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="checkBox_show_metadata">
+        <property name="text">
+         <string>Metadata</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="checkBox_show_reset">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="checkBox_show_bpm">
+        <property name="text">
+         <string>BPM</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QCheckBox" name="checkBox_show_color">
+        <property name="text">
+         <string>Color</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="checkBox_show_file_browser">
+        <property name="text">
+         <string>Open in File Browser</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="checkBox_show_properties">
+        <property name="text">
+         <string>Properties</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="checkBox_show_search_related">
+        <property name="text">
+         <string>Search related Tracks</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+        <item row="4" column="0">
+       <widget class="QCheckBox" name="checkBox_show_find_on_web">
+        <property name="text">
+         <string>Find on Web (Not yet implemented)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_track_menu">
+        <property name="text">
+         <string>Editable TrackMenu Draft</string>
+        </property>
+        <property name="topMargin">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_track_menu_2">
+        <property name="text">
+         <string>In order to changes to be applied. You must restart the Mixxx.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <item>
     <widget class="QGroupBox" name="groupBox_settingsDir">
      <property name="title">
       <string>Settings Directory</string>
@@ -546,6 +703,19 @@
   <tabstop>checkBox_show_traktor</tabstop>
   <tabstop>checkBox_show_rekordbox</tabstop>
   <tabstop>checkBox_show_serato</tabstop>
+  <tabstop>checkBox_show_auto_dj</tabstop>
+  <tabstop>checkBox_show_load_to</tabstop>
+  <tabstop>checkBox_show_playlist</tabstop>
+  <tabstop>checkBox_show_crate</tabstop>
+  <tabstop>checkBox_show_remove</tabstop>
+  <tabstop>checkBox_show_metadata</tabstop>
+  <tabstop>checkBox_show_reset</tabstop>
+  <tabstop>checkBox_show_bpm</tabstop>
+  <tabstop>checkBox_show_color</tabstop>
+  <tabstop>checkBox_show_file_browser</tabstop>
+  <tabstop>checkBox_show_properties</tabstop>
+  <tabstop>checkBox_show_search_related</tabstop>
+  <tabstop>checkBox_show_find_on_web</tabstop>
   <tabstop>PushButtonOpenSettingsDir</tabstop>
  </tabstops>
  <resources/>
