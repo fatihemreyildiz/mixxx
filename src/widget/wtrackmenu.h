@@ -49,11 +49,13 @@ class WTrackMenu : public QMenu {
         FileBrowser = 1 << 11,
         Properties = 1 << 12,
         SearchRelated = 1 << 13,
-        UpdateReplayGain = 1 << 14,
+        UpdateReplayGainFromPregain = 1 << 14,
+        SelectInLibrary = 1 << 15,
+        Analyze = 1 << 16,
         TrackModelFeatures = Remove | HideUnhidePurge,
-        All = AutoDJ | LoadTo | Playlist | Crate | Remove | Metadata | Reset |
+        All = AutoDJ | LoadTo | Playlist | Crate | Remove | Metadata | Reset | Analyze |
                 BPM | Color | HideUnhidePurge | RemoveFromDisk | FileBrowser |
-                Properties | SearchRelated | UpdateReplayGain
+                Properties | SearchRelated | UpdateReplayGainFromPregain | SelectInLibrary
     };
     Q_DECLARE_FLAGS(Features, Feature)
 
@@ -83,10 +85,12 @@ class WTrackMenu : public QMenu {
 
   signals:
     void loadTrackToPlayer(TrackPointer pTrack, const QString& group, bool play = false);
+    void trackMenuVisible(bool visible);
 
   private slots:
     // File
     void slotOpenInFileBrowser();
+    void slotSelectInLibrary();
 
     // Row color
     void slotColorPicked(const mixxx::RgbColor::optional_t& color);
@@ -95,15 +99,20 @@ class WTrackMenu : public QMenu {
     void slotClearBeats();
     void slotClearPlayCount();
     void slotClearRating();
+    void slotClearComment();
     void slotClearMainCue();
     void slotClearHotCues();
     void slotClearIntroCue();
     void slotClearOutroCue();
-    void slotClearLoop();
+    void slotClearLoops();
     void slotClearKey();
     void slotClearReplayGain();
     void slotClearWaveform();
     void slotClearAllMetadata();
+
+    // Analysis
+    void slotAnalyze();
+    void slotReanalyze();
 
     // BPM
     void slotLockBpm();
@@ -138,6 +147,7 @@ class WTrackMenu : public QMenu {
     void slotPurge();
 
   private:
+    void closeEvent(QCloseEvent* event) override;
     // This getter verifies that m_pTrackModel is set when
     // invoked.
     const QModelIndexList& getTrackIndices() const;
@@ -175,7 +185,9 @@ class WTrackMenu : public QMenu {
     void updateSelectionCrates(QWidget* pWidget);
 
     void addToAutoDJ(PlaylistDAO::AutoDJSendLoc loc);
+    void addToAnalysis();
 
+    void clearBeats();
     void lockBpm(bool lock);
 
     void loadSelectionToGroup(const QString& group, bool play = false);
@@ -211,6 +223,7 @@ class WTrackMenu : public QMenu {
     QMenu* m_pMetadataMenu{};
     QMenu* m_pMetadataUpdateExternalCollectionsMenu{};
     QMenu* m_pClearMetadataMenu{};
+    QMenu* m_pAnalyzeMenu{};
     QMenu* m_pBPMMenu{};
     QMenu* m_pColorMenu{};
     WCoverArtMenu* m_pCoverMenu{};
@@ -218,7 +231,7 @@ class WTrackMenu : public QMenu {
     QMenu* m_pRemoveFromDiskMenu{};
 
     // Update ReplayGain from Track
-    QAction* m_pUpdateReplayGain{};
+    QAction* m_pUpdateReplayGainAct{};
 
     // Reload Track Metadata Action:
     QAction* m_pImportMetadataFromFileAct{};
@@ -250,6 +263,9 @@ class WTrackMenu : public QMenu {
     // Open file in default file browser
     QAction* m_pFileBrowserAct{};
 
+    // Select track in library
+    QAction* m_pSelectInLibraryAct{};
+
     // BPM feature
     QAction* m_pBpmLockAction{};
     QAction* m_pBpmUnlockAction{};
@@ -264,6 +280,10 @@ class WTrackMenu : public QMenu {
     // Track color
     WColorPickerAction* m_pColorPickerAction{};
 
+    // Analysis actions
+    QAction* m_pAnalyzeAction{};
+    QAction* m_pReanalyzeAction{};
+
     // Clear track metadata actions
     QAction* m_pClearBeatsAction{};
     QAction* m_pClearPlayCountAction{};
@@ -272,8 +292,9 @@ class WTrackMenu : public QMenu {
     QAction* m_pClearHotCuesAction{};
     QAction* m_pClearIntroCueAction{};
     QAction* m_pClearOutroCueAction{};
-    QAction* m_pClearLoopAction{};
+    QAction* m_pClearLoopsAction{};
     QAction* m_pClearWaveformAction{};
+    QAction* m_pClearCommentAction{};
     QAction* m_pClearKeyAction{};
     QAction* m_pClearReplayGainAction{};
     QAction* m_pClearAllMetadataAction{};
@@ -287,14 +308,15 @@ class WTrackMenu : public QMenu {
     struct UpdateExternalTrackCollection {
         QPointer<ExternalTrackCollection> externalTrackCollection;
         QAction* action{};
-        };
-        QList<UpdateExternalTrackCollection> m_updateInExternalTrackCollections;
-
-        bool m_bPlaylistMenuLoaded;
-        bool m_bCrateMenuLoaded;
-
-        Features m_eActiveFeatures;
-        const Features m_eTrackModelFeatures;
     };
+
+    QList<UpdateExternalTrackCollection> m_updateInExternalTrackCollections;
+
+    bool m_bPlaylistMenuLoaded;
+    bool m_bCrateMenuLoaded;
+
+    Features m_eActiveFeatures;
+    const Features m_eTrackModelFeatures;
+};
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(WTrackMenu::Features)
