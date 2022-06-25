@@ -17,6 +17,7 @@
 #include "library/dlgtrackmetadataexport.h"
 #include "library/externaltrackcollection.h"
 #include "library/library.h"
+#include "library/library_prefs.h"
 #include "library/librarytablemodel.h"
 #include "library/trackcollection.h"
 #include "library/trackcollectionmanager.h"
@@ -41,6 +42,61 @@
 #include "widget/wskincolor.h"
 #include "widget/wstarrating.h"
 #include "widget/wwidget.h"
+
+namespace {
+const ConfigKey kShowAutoDJ{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowAutoDJ")};
+
+const ConfigKey kShowLoadTo{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowLoadTo")};
+
+const ConfigKey kShowPlaylist{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowPlaylist")};
+
+const ConfigKey kShowCrate{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowCrate")};
+
+const ConfigKey kShowRemove{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowRemove")};
+
+const ConfigKey kShowMetadata{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowMetadata")};
+
+const ConfigKey kShowReset{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowReset")};
+
+const ConfigKey kShowBPM{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowBPM")};
+
+const ConfigKey kShowColor{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowColor")};
+
+const ConfigKey kShowFileBrowser{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowFileBrowser")};
+
+const ConfigKey kShowProperties{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowProperties")};
+
+const ConfigKey kSearchRelated{
+        QStringLiteral("[Library]"),
+        QStringLiteral("SearchRelated")};
+
+const ConfigKey kFindOnWeb{
+        QStringLiteral("[Library]"),
+        QStringLiteral("FindOnWeb")};
+
+} // anonymous namespace
 
 WTrackMenu::WTrackMenu(
         QWidget* parent,
@@ -2160,52 +2216,134 @@ bool WTrackMenu::featureIsEnabled(Feature flag) const {
     }
 
     switch (flag) {
-    case Feature::AutoDJ:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::AddToAutoDJ);
-    case Feature::LoadTo:
-        return m_pTrackModel->hasCapabilities(
-                       TrackModel::Capability::LoadToDeck) ||
-                m_pTrackModel->hasCapabilities(
-                        TrackModel::Capability::LoadToSampler) ||
-                m_pTrackModel->hasCapabilities(
-                        TrackModel::Capability::LoadToPreviewDeck);
-    case Feature::Playlist:
-    case Feature::Crate:
-        return m_pTrackModel->hasCapabilities(
-                TrackModel::Capability::AddToTrackSet);
-    case Feature::Remove:
-        return m_pTrackModel->hasCapabilities(
-                       TrackModel::Capability::Remove) ||
-                m_pTrackModel->hasCapabilities(
-                        TrackModel::Capability::RemovePlaylist) ||
-                m_pTrackModel->hasCapabilities(
-                        TrackModel::Capability::RemoveCrate);
-    case Feature::Metadata:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-    case Feature::Analyze:
-        return m_pTrackModel->hasCapabilities(
-                TrackModel::Capability::EditMetadata |
-                TrackModel::Capability::Analyze);
-    case Feature::Reset:
-        return m_pTrackModel->hasCapabilities(
-                TrackModel::Capability::EditMetadata |
-                TrackModel::Capability::ResetPlayed);
-    case Feature::BPM:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-    case Feature::Color:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-    case Feature::HideUnhidePurge:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide) ||
-                m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide) ||
-                m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge);
-    case Feature::RemoveFromDisk:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
-    case Feature::FileBrowser:
+    case Feature::AutoDJ: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowAutoDJ);
+        if (isFeatureEnabled)
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::AddToAutoDJ);
+        else
+            return false;
+    }
+    case Feature::LoadTo: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowLoadTo);
+        if (isFeatureEnabled)
+            return m_pTrackModel->hasCapabilities(
+                           TrackModel::Capability::LoadToDeck) ||
+                    m_pTrackModel->hasCapabilities(
+                            TrackModel::Capability::LoadToSampler) ||
+                    m_pTrackModel->hasCapabilities(
+                            TrackModel::Capability::LoadToPreviewDeck);
+        else
+            return false;
+    }
+    case Feature::Playlist: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowPlaylist);
+        if (isFeatureEnabled) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    case Feature::Crate: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowCrate);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(
+                    TrackModel::Capability::AddToTrackSet);
+        } else {
+            return false;
+        }
+    }
+
+    case Feature::Remove: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowRemove);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(
+                           TrackModel::Capability::Remove) ||
+                    m_pTrackModel->hasCapabilities(
+                            TrackModel::Capability::RemovePlaylist) ||
+                    m_pTrackModel->hasCapabilities(
+                            TrackModel::Capability::RemoveCrate);
+        } else
+            return false;
+    }
+
+    case Feature::Metadata: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowMetadata);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+
+        } else
+            return false;
+    }
+
+    case Feature::Reset: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowReset);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(
+                    TrackModel::Capability::EditMetadata |
+                    TrackModel::Capability::ResetPlayed);
+        } else
+            return false;
+    }
+
+    case Feature::BPM: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowBPM);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+        } else
+            return false;
+    }
+
+    case Feature::Color: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowColor);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+        } else
+            return false;
+    }
+
+    case Feature::HideUnhidePurge: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowFileBrowser); //
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide) ||
+                    m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide) ||
+                    m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge);
+        } else
+            return false;
+    }
+
+    case Feature::RemoveFromDisk: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowRemove);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
+        } else
+            return false;
+    }
+
+    case Feature::FileBrowser: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowFileBrowser);
+        if (isFeatureEnabled) {
+            return true;
+        } else
+            return false;
+    }
         return true;
-    case Feature::Properties:
-        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-    case Feature::SearchRelated:
-        return m_pLibrary != nullptr;
+    case Feature::Properties: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowProperties);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+        } else
+            return false;
+    }
+
+    case Feature::SearchRelated: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kSearchRelated);
+        if (isFeatureEnabled) {
+            return m_pLibrary != nullptr;
+        } else
+            return false;
+    }
+
     case Feature::SelectInLibrary:
         return m_pTrack != nullptr;
     default:
