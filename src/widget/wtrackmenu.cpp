@@ -2276,6 +2276,16 @@ bool WTrackMenu::featureIsEnabled(Feature flag) const {
             return false;
     }
 
+    case Feature::Analyze: {
+        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowMetadata);
+        if (isFeatureEnabled) {
+            return m_pTrackModel->hasCapabilities(
+                    TrackModel::Capability::EditMetadata |
+                    TrackModel::Capability::Analyze);
+        } else
+            return false;
+    }
+
     case Feature::Reset: {
         bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowReset);
         if (isFeatureEnabled) {
