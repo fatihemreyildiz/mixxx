@@ -1,10 +1,8 @@
 #pragma once
 
-#include <QAction>
 #include <QMenu>
-#include <QUrlQuery>
 
-class Track;
+#include "track/track.h"
 
 class WFindOnWebMenu : public QMenu {
     Q_OBJECT
@@ -13,36 +11,14 @@ class WFindOnWebMenu : public QMenu {
             QWidget* parent = nullptr);
     ~WFindOnWebMenu() override = default;
 
-    enum class Service {
-        SoundCloud,
-        LastFm,
-        Discogs
-    };
-
-    enum class TrackSearchProperties {
-        Artist,
-        ArtistAndTitle,
-        ArtistAndAlbum,
-        Album,
-        Title
-    };
-
     static bool hasEntriesForTrack(const Track& track);
 
-    void addSubmenusForServices(const Track& track);
+  protected:
+    QString composeActionText(const QString& prefix, const QString& trackProperty);
 
-  private:
-    void openInBrowser(WFindOnWebMenu::Service service,
-            WFindOnWebMenu::TrackSearchProperties trackSearchProperties,
-            const QString& queryValue);
+    QString composeSearchQuery(const QString& artist, const QString& trackAlbumOrTitle);
 
-    void populateFromTrackProperties(
-            const Track& track,
-            const QString& serviceTitle,
-            Service service);
+    void openInBrowser(const QString& query, const QString& serviceUrl);
 
-    void addActions(Service service,
-            const QString& queryValue,
-            QMenu* pServiceMenu,
-            TrackSearchProperties trackSearchProperties);
+    void openInBrowser(const QString& query, const QString& queryType, const QString& serviceUrl);
 };
