@@ -26,7 +26,7 @@ constexpr WTrackMenu::Features kTrackMenuFeatures =
         WTrackMenu::Feature::FileBrowser |
         WTrackMenu::Feature::Properties |
         WTrackMenu::Feature::UpdateReplayGainFromPregain |
-        WTrackMenu::Feature::FindOnWeb |
+        WTrackMenu::Feature::FindOnOnline |
         WTrackMenu::Feature::SelectInLibrary;
 
 } // anonymous namespace

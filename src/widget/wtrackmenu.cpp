@@ -34,6 +34,7 @@
 #include "util/parented_ptr.h"
 #include "util/qt.h"
 #include "util/widgethelper.h"
+#include "widget/findonwebfactory.h"
 #include "widget/wcolorpickeraction.h"
 #include "widget/wcoverartlabel.h"
 #include "widget/wcoverartmenu.h"
@@ -186,16 +187,15 @@ void WTrackMenu::createMenus() {
                 });
     }
 
-    if (featureIsEnabled(Feature::FindOnWeb)) {
-        DEBUG_ASSERT(!m_pFindOnMenu);
-        m_pFindOnMenu =
-                make_parented<WFindOnWebMenu>(this);
-
-        connect(m_pFindOnMenu,
+    if (featureIsEnabled(Feature::FindOnOnline)) { // Find on web factory implementation
+        DEBUG_ASSERT(!m_pFindOnWebFactory);
+        m_pFindOnWebFactory =
+                make_parented<FindOnWebFactory>(this);
+        connect(m_pFindOnWebFactory,
                 &QMenu::aboutToShow,
                 this,
                 [this] {
-                    m_pFindOnMenu->clear();
+                    m_pFindOnWebFactory->clear();
                     const auto pTrack = getFirstTrackPointer();
                     if (pTrack) {
                         m_pFindOnMenu->addSubmenusForServices(*pTrack);
@@ -557,8 +557,8 @@ void WTrackMenu::setupActions() {
         }
 
         m_pMetadataMenu->addMenu(m_pCoverMenu);
-        if (featureIsEnabled(Feature::FindOnWeb)) {
-            m_pMetadataMenu->addMenu(m_pFindOnMenu);
+        if (featureIsEnabled(Feature::FindOnOnline)) {
+            m_pMetadataMenu->addMenu(m_pFindOnWebFactory);
             addSeparator();
         }
         addMenu(m_pMetadataMenu);
@@ -2232,7 +2232,7 @@ bool WTrackMenu::featureIsEnabled(Feature flag) const {
         return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
     case Feature::FileBrowser:
         return true;
-    case Feature::FindOnWeb:
+    case Feature::FindOnOnline:
         return true;
     case Feature::Properties:
         return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
