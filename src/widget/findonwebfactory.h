@@ -5,8 +5,7 @@
 class FindOnWeb;
 class Track;
 
-class FindOnWebFactory : public QMenu {
-    Q_OBJECT
+class FindOnWebFactory {
   public:
     enum Service {
         Discogs,
@@ -14,17 +13,10 @@ class FindOnWebFactory : public QMenu {
         Lastfm
     };
 
-    explicit FindOnWebFactory(
-            QWidget* parent = nullptr);
-
-    ~FindOnWebFactory() override = default;
-
-    void createServiceMenus(QMenu* menu, const Track& track);
-
-    bool serviceIsEnabled(Service service) const;
+    static void createServiceMenus(QMenu* menu, const Track& track);
 
     void openInBrowser(const QString& query);
 
-  signals:
-    bool triggerBrowser(const QString& query);
+  private:
+    static bool serviceIsEnabled(Service service);
 };

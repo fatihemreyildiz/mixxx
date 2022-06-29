@@ -29,7 +29,13 @@ void FindOnSoundcloud::addSubmenusForServices(QMenu* pFindOnMenu, const Track& t
     pFindOnMenu->addMenu(m_pServiceMenu);
     addSeparator();
     if (!artist.isEmpty()) {
-        m_pServiceMenu->addAction(artist);
+        m_pServiceMenu->addAction(
+                artist);
+        //m_pServiceMenu->addAction(artist,
+        //this,
+        //[this]{
+        //    emit triggerBrowser();
+        //});
     }
     if (!trackTitle.isEmpty()) {
         m_pServiceMenu->addAction(trackTitle);
@@ -37,4 +43,8 @@ void FindOnSoundcloud::addSubmenusForServices(QMenu* pFindOnMenu, const Track& t
     if (!album.isEmpty()) {
         m_pServiceMenu->addAction(album);
     }
+}
+
+void FindOnSoundcloud::writeOnConsole() {
+    qDebug() << "Soundcloud";
 }

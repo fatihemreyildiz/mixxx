@@ -187,21 +187,21 @@ void WTrackMenu::createMenus() {
                 });
     }
 
-    if (featureIsEnabled(Feature::FindOnOnline)) { // Find on web factory implementation
-        DEBUG_ASSERT(!m_pFindOnWebFactory);
-        m_pFindOnWebFactory =
-                make_parented<FindOnWebFactory>(this);
-        connect(m_pFindOnWebFactory,
+    if (featureIsEnabled(Feature::FindOnOnline)) {
+        m_pFindOnWebMenu = new QMenu(this);
+        m_pFindOnWebMenu->setTitle("Find on Web");
+
+        connect(m_pFindOnWebMenu,
                 &QMenu::aboutToShow,
                 this,
                 [this] {
-                    m_pFindOnWebFactory->clear();
+                    m_pFindOnWebMenu->clear();
                     const auto pTrack = getFirstTrackPointer();
                     if (pTrack) {
-                        m_pFindOnMenu->addSubmenusForServices(*pTrack);
+                        FindOnWebFactory::createServiceMenus(m_pFindOnWebMenu, *pTrack);
                     }
-                    m_pFindOnMenu->setEnabled(
-                            !m_pFindOnMenu->isEmpty());
+                    m_pFindOnWebMenu->setEnabled(
+                            !m_pFindOnWebMenu->isEmpty());
                 });
     }
 
@@ -558,7 +558,7 @@ void WTrackMenu::setupActions() {
 
         m_pMetadataMenu->addMenu(m_pCoverMenu);
         if (featureIsEnabled(Feature::FindOnOnline)) {
-            m_pMetadataMenu->addMenu(m_pFindOnWebFactory);
+            m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
             addSeparator();
         }
         addMenu(m_pMetadataMenu);

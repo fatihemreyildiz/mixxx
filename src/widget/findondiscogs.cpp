@@ -31,3 +31,7 @@ void FindOnDiscogs::addSubmenusForServices(QMenu* pFindOnMenu, const Track& trac
         m_pServiceMenu->addAction(album);
     }
 }
+
+void FindOnDiscogs::writeOnConsole() {
+    qDebug() << "Discogs?";
+}
