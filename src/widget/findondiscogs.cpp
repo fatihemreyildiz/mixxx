@@ -1,7 +1,6 @@
 #include "findondiscogs.h"
 
 #include <QMenu>
-#include <QtDebug>
 
 #include "track/track.h"
 #include "util/parented_ptr.h"
@@ -9,29 +8,41 @@
 namespace {
 const QString kServiceTitle = QStringLiteral("Discogs");
 
+const QString kQueryTypeRelease = QStringLiteral("release");
+
+const QString kQueryTypeArtist = QStringLiteral("artist");
+
 const QString kSearchUrl = QStringLiteral(
-        "https://www.discogs.com/search/?"); // List of Query needed.
+        "https://www.discogs.com/search/?");
 } //namespace
 
 void FindOnDiscogs::addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) {
-    const auto artist = track.getArtist();
-    const auto trackTitle = track.getTitle();
-    const auto album = track.getAlbum();
+    const QString artist = track.getArtist();
+    const QString trackTitle = track.getTitle();
+    const QString album = track.getAlbum();
     auto m_pServiceMenu = make_parented<QMenu>(this);
     m_pServiceMenu->setTitle(kServiceTitle);
     pFindOnMenu->addMenu(m_pServiceMenu);
     addSeparator();
     if (!artist.isEmpty()) {
-        m_pServiceMenu->addAction(artist);
+        m_pServiceMenu->addAction(artist,
+                this,
+                [this, artist] {
+                    this->openInBrowser(artist, kQueryTypeArtist, kSearchUrl);
+                });
     }
     if (!trackTitle.isEmpty()) {
-        m_pServiceMenu->addAction(trackTitle);
+        m_pServiceMenu->addAction(trackTitle,
+                this,
+                [this, trackTitle] {
+                    this->openInBrowser(trackTitle, kQueryTypeRelease, kSearchUrl);
+                });
     }
     if (!album.isEmpty()) {
-        m_pServiceMenu->addAction(album);
+        m_pServiceMenu->addAction(album,
+                this,
+                [this, album] {
+                    this->openInBrowser(album, kSearchUrl);
+                });
     }
-}
-
-void FindOnDiscogs::writeOnConsole() {
-    qDebug() << "Discogs?";
 }

@@ -3,9 +3,8 @@
 #include "findonweb.h"
 #include "util/parented_ptr.h"
 
-class FindOnSoundcloud : public FindOnWeb, public QMenu {
+class FindOnSoundcloud : public FindOnWeb {
   public:
-    void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) override;
-
-    void writeOnConsole() override;
+    FindOnSoundcloud(QMenu* pFindOnMenu, const Track& track, const QString& serviceTitle);
+    //void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) override;
 };

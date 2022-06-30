@@ -34,11 +34,11 @@
 #include "util/parented_ptr.h"
 #include "util/qt.h"
 #include "util/widgethelper.h"
+#include "widget/findonweb.h"
 #include "widget/findonwebfactory.h"
 #include "widget/wcolorpickeraction.h"
 #include "widget/wcoverartlabel.h"
 #include "widget/wcoverartmenu.h"
-#include "widget/wfindonwebmenu.h"
 #include "widget/wsearchrelatedtracksmenu.h"
 #include "widget/wskincolor.h"
 #include "widget/wstarrating.h"
@@ -188,20 +188,19 @@ void WTrackMenu::createMenus() {
     }
 
     if (featureIsEnabled(Feature::FindOnOnline)) {
-        m_pFindOnWebMenu = new QMenu(this);
-        m_pFindOnWebMenu->setTitle("Find on Web");
-
-        connect(m_pFindOnWebMenu,
+        DEBUG_ASSERT(!m_pFindOnWeb);
+        m_pFindOnWeb = make_parented<FindOnWeb>(this); //¿Is it okay to have parent menu?
+        connect(m_pFindOnWeb,
                 &QMenu::aboutToShow,
                 this,
                 [this] {
-                    m_pFindOnWebMenu->clear();
+                    m_pFindOnWeb->clear();
                     const auto pTrack = getFirstTrackPointer();
                     if (pTrack) {
-                        FindOnWebFactory::createServiceMenus(m_pFindOnWebMenu, *pTrack);
+                        FindOnWebFactory::createServiceMenus(m_pFindOnWeb, *pTrack);
                     }
-                    m_pFindOnWebMenu->setEnabled(
-                            !m_pFindOnWebMenu->isEmpty());
+                    m_pFindOnWeb->setEnabled(
+                            !m_pFindOnWeb->isEmpty());
                 });
     }
 
@@ -557,8 +556,8 @@ void WTrackMenu::setupActions() {
         }
 
         m_pMetadataMenu->addMenu(m_pCoverMenu);
-        if (featureIsEnabled(Feature::FindOnOnline)) {
-            m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
+        if (featureIsEnabled(Feature::FindOnOnline)) { // TODO: Check if Find on Web is turned on
+            m_pMetadataMenu->addMenu(m_pFindOnWeb);
             addSeparator();
         }
         addMenu(m_pMetadataMenu);

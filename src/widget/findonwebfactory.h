@@ -15,8 +15,6 @@ class FindOnWebFactory {
 
     static void createServiceMenus(QMenu* menu, const Track& track);
 
-    void openInBrowser(const QString& query);
-
   private:
     static bool serviceIsEnabled(Service service);
 };

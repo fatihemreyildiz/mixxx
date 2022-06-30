@@ -3,9 +3,7 @@
 #include "findonweb.h"
 #include "util/parented_ptr.h"
 
-class FindOnDiscogs : public FindOnWeb, public QMenu {
+class FindOnDiscogs : public FindOnWeb {
   public:
     void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) override;
-
-    void writeOnConsole() override;
 };
