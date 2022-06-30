@@ -12,9 +12,6 @@ FindOnWeb::FindOnWeb(QWidget* parent)
         : QMenu(tr("Find on Web"), parent) {
 }
 
-void FindOnWeb::addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) {
-}
-
 bool FindOnWeb::hasEntriesForTrack(const Track& track) {
     return !(track.getArtist().isEmpty() &&
             track.getAlbum().isEmpty() &&

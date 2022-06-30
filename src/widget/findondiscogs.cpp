@@ -16,7 +16,7 @@ const QString kSearchUrl = QStringLiteral(
         "https://www.discogs.com/search/?");
 } //namespace
 
-void FindOnDiscogs::addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) {
+FindOnDiscogs::FindOnDiscogs(QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();

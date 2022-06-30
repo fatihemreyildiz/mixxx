@@ -6,6 +6,8 @@
 #include "util/parented_ptr.h"
 
 namespace {
+const QString kServiceTitle = QStringLiteral("Soundcloud");
+
 const QString kSearchUrlArtist = QStringLiteral("https://soundcloud.com/search/people?");
 
 const QString kSearchUrlTitle = QStringLiteral("https://soundcloud.com/search/sounds?");
@@ -14,12 +16,12 @@ const QString kSearchUrlAlbum = QStringLiteral("https://soundcloud.com/search/al
 } // namespace
 
 FindOnSoundcloud::FindOnSoundcloud(
-        QMenu* pFindOnMenu, const Track& track, const QString& serviceTitle) {
+        QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
     auto m_pServiceMenu = make_parented<QMenu>(this);
-    m_pServiceMenu->setTitle(serviceTitle);
+    m_pServiceMenu->setTitle(kServiceTitle);
     pFindOnMenu->addMenu(m_pServiceMenu);
     m_pServiceMenu->addSeparator();
     if (!artist.isEmpty()) {

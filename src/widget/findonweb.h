@@ -14,8 +14,6 @@ class FindOnWeb : public QMenu {
 
     static bool hasEntriesForTrack(const Track& track);
 
-    virtual void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track);
-
   protected:
     void openInBrowser(const QString& query, const QString& serviceUrl);
 

@@ -5,5 +5,5 @@
 
 class FindOnLastfm : public FindOnWeb {
   public:
-    void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) override;
+    FindOnLastfm(QMenu* pFindOnMenu, const Track& track);
 };

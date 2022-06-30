@@ -9,24 +9,16 @@
 #include "findonweb.h"
 #include "track/track.h"
 
-namespace {
-const QString kSoundcloud = QStringLiteral("Soundcloud");
-}
-
 void FindOnWebFactory::createServiceMenus(
-        QMenu* menu, const Track& track) { // TODO: Call More Service Menus
+        QMenu* menu, const Track& track) {
     if (FindOnWebFactory::serviceIsEnabled(FindOnWebFactory::Service::Soundcloud)) {
-        new FindOnSoundcloud(menu, track, kSoundcloud); // ¿Should we use this?
-        // For this one we need to define every service menu as a constructor
+        new FindOnSoundcloud(menu, track);
     }
     if (FindOnWebFactory::serviceIsEnabled(FindOnWebFactory::Service::Discogs)) {
-        FindOnWeb* pFindOnWeb = new FindOnDiscogs();
-        pFindOnWeb->addSubmenusForServices(menu, track); // ¿Or this?
-        // With this one we can simply create services on without define for every service.
+        new FindOnDiscogs(menu, track);
     }
     if (FindOnWebFactory::serviceIsEnabled(FindOnWebFactory::Service::Lastfm)) {
-        FindOnWeb* pFindOnWeb = new FindOnLastfm();
-        pFindOnWeb->addSubmenusForServices(menu, track);
+        new FindOnLastfm(menu, track);
     }
 }
 

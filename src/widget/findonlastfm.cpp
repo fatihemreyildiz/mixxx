@@ -15,7 +15,7 @@ const QString kSearchUrlTitle = QStringLiteral("https://www.last.fm/search/track
 const QString kSearchUrlAlbum = QStringLiteral("https://www.last.fm/search/albums?");
 } //namespace
 
-void FindOnLastfm::addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) {
+FindOnLastfm::FindOnLastfm(QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();

@@ -5,5 +5,5 @@
 
 class FindOnDiscogs : public FindOnWeb {
   public:
-    void addSubmenusForServices(QMenu* pFindOnMenu, const Track& track) override;
+    FindOnDiscogs(QMenu* pFindOnMenu, const Track& track);
 };
