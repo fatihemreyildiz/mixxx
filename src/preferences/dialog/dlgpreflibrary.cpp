@@ -206,6 +206,7 @@ void DlgPrefLibrary::slotResetToDefaults() {
     radioButton_dbclick_bottom->setChecked(false);
     radioButton_dbclick_top->setChecked(false);
     radioButton_dbclick_deck->setChecked(true);
+    checkBox_show_findonwebmenu->setChecked(true);
     spinBoxRowHeight->setValue(Library::kDefaultRowHeightPx);
     setLibraryFont(QApplication::font());
     searchDebouncingTimeoutSpinBox->setValue(
@@ -243,6 +244,9 @@ void DlgPrefLibrary::slotUpdate() {
             ConfigKey("[Library]","ShowRekordboxLibrary"), true));
     checkBox_show_serato->setChecked(m_pConfig->getValue(
             ConfigKey("[Library]", "ShowSeratoLibrary"), true));
+
+    checkBox_show_findonwebmenu->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowFindOnWebMenu"), true));
 
     switch (m_pConfig->getValue<int>(
             kTrackDoubleClickActionConfigKey,
@@ -425,6 +429,9 @@ void DlgPrefLibrary::slotApply() {
                 ConfigValue((int)checkBox_show_rekordbox->isChecked()));
     m_pConfig->set(ConfigKey("[Library]", "ShowSeratoLibrary"),
             ConfigValue((int)checkBox_show_serato->isChecked()));
+
+    m_pConfig->set(ConfigKey("[Library]", "ShowFindOnWebMenu"),
+            ConfigValue((int)checkBox_show_findonwebmenu->isChecked()));
 
     int dbclick_status;
     if (radioButton_dbclick_bottom->isChecked()) {

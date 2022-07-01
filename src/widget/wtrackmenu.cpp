@@ -556,9 +556,14 @@ void WTrackMenu::setupActions() {
         }
 
         m_pMetadataMenu->addMenu(m_pCoverMenu);
-        if (featureIsEnabled(Feature::FindOnWeb)) { // TODO: Check if Find on Web is turned on
-            m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
-            addSeparator();
+        if (featureIsEnabled(Feature::FindOnWeb)) {
+            bool isFindOnWebMenuEnabled = m_pConfig->getValue<bool>(
+                    ConfigKey(QStringLiteral("[Library]"),
+                            QStringLiteral("ShowFindOnWebMenu")));
+            if (isFindOnWebMenuEnabled) {
+                m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
+                addSeparator();
+            }
         }
         addMenu(m_pMetadataMenu);
     }
