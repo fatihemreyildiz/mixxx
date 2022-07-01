@@ -25,21 +25,21 @@ FindOnSoundcloud::FindOnSoundcloud(
     pFindOnMenu->addMenu(m_pServiceMenu);
     m_pServiceMenu->addSeparator();
     if (!artist.isEmpty()) {
-        m_pServiceMenu->addAction(artist,
+        m_pServiceMenu->addAction(composeActionText(tr("Artist"), artist),
                 this,
                 [this, artist] {
                     this->openInBrowser(artist, kSearchUrlArtist);
                 });
     }
     if (!trackTitle.isEmpty()) {
-        m_pServiceMenu->addAction(trackTitle,
+        m_pServiceMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
                     this->openInBrowser(trackTitle, kSearchUrlTitle);
                 });
     }
     if (!album.isEmpty()) {
-        m_pServiceMenu->addAction(album,
+        m_pServiceMenu->addAction(composeActionText(tr("Album"), album),
                 this,
                 [this, album] {
                     this->openInBrowser(album, kSearchUrlAlbum);

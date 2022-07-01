@@ -15,6 +15,8 @@ class FindOnWeb : public QMenu {
     static bool hasEntriesForTrack(const Track& track);
 
   protected:
+    QString composeActionText(const QString& prefix, const QString& trackProperty);
+
     void openInBrowser(const QString& query, const QString& serviceUrl);
 
     void openInBrowser(const QString& query, const QString& queryType, const QString& serviceUrl);

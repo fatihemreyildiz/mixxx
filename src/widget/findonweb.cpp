@@ -18,6 +18,10 @@ bool FindOnWeb::hasEntriesForTrack(const Track& track) {
             track.getTitle().isEmpty());
 }
 
+QString FindOnWeb::composeActionText(const QString& prefix, const QString& trackProperty) {
+    return prefix + QStringLiteral(" | ") + trackProperty;
+}
+
 void FindOnWeb::openInBrowser(const QString& query, const QString& serviceUrl) {
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("q", query);
