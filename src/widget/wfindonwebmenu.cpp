@@ -22,6 +22,11 @@ QString WFindOnWebMenu::composeActionText(const QString& prefix, const QString& 
     return prefix + QStringLiteral(" | ") + trackProperty;
 }
 
+QString WFindOnWebMenu::composeSearchQuery(
+        const QString& artist, const QString& trackAlbumOrTitle) {
+    return artist + QStringLiteral(" ") + trackAlbumOrTitle;
+}
+
 void WFindOnWebMenu::openInBrowser(const QString& query, const QString& serviceUrl) {
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("q", query);

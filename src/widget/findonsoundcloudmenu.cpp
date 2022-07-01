@@ -32,6 +32,15 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
                 });
     }
     if (!trackTitle.isEmpty()) {
+        if (!artist.isEmpty()) {
+            const QString artistWithTrackTitle = composeSearchQuery(artist, trackTitle);
+            pSoundcloudMenu->addAction(composeActionText(tr("Artist + Title"),
+                                               artistWithTrackTitle),
+                    this,
+                    [this, artistWithTrackTitle] {
+                        this->openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
+                    });
+        }
         pSoundcloudMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
@@ -39,10 +48,19 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
                 });
     }
     if (!album.isEmpty()) {
-        pSoundcloudMenu->addAction(composeActionText(tr("Album"), album),
-                this,
-                [this, album] {
-                    this->openInBrowser(album, kSearchUrlAlbum);
-                });
+        if (!artist.isEmpty()) {
+            const QString artistWithAlbum = composeSearchQuery(artist, album);
+            pSoundcloudMenu->addAction(composeActionText(tr("Artist + Album"), artistWithAlbum),
+                    this,
+                    [this, artistWithAlbum] {
+                        this->openInBrowser(artistWithAlbum, kSearchUrlAlbum);
+                    });
+        } else {
+            pSoundcloudMenu->addAction(composeActionText(tr("Album"), album),
+                    this,
+                    [this, album] {
+                        this->openInBrowser(album, kSearchUrlAlbum);
+                    });
+        }
     }
 }

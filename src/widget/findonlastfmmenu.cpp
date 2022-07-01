@@ -31,6 +31,14 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
                 });
     }
     if (!trackTitle.isEmpty()) {
+        if (!artist.isEmpty()) {
+            const QString artistWithTrackTitle = composeSearchQuery(artist, trackTitle);
+            pLastfmMenu->addAction(composeActionText(tr("Artist + Title"), artistWithTrackTitle),
+                    this,
+                    [this, artistWithTrackTitle] {
+                        this->openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
+                    });
+        }
         pLastfmMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
@@ -38,10 +46,19 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
                 });
     }
     if (!album.isEmpty()) {
-        pLastfmMenu->addAction(composeActionText(tr("Album"), album),
-                this,
-                [this, album] {
-                    this->openInBrowser(album, kSearchUrlAlbum);
-                });
+        if (!artist.isEmpty()) {
+            const QString artistWithAlbum = composeSearchQuery(artist, album);
+            pLastfmMenu->addAction(composeActionText(tr("Artist + Album"), artistWithAlbum),
+                    this,
+                    [this, artistWithAlbum] {
+                        this->openInBrowser(artistWithAlbum, kSearchUrlAlbum);
+                    });
+        } else {
+            pLastfmMenu->addAction(composeActionText(tr("Album"), album),
+                    this,
+                    [this, album] {
+                        this->openInBrowser(album, kSearchUrlAlbum);
+                    });
+        }
     }
 }
