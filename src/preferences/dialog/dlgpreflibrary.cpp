@@ -207,6 +207,9 @@ void DlgPrefLibrary::slotResetToDefaults() {
     radioButton_dbclick_top->setChecked(false);
     radioButton_dbclick_deck->setChecked(true);
     checkBox_show_findonwebmenu->setChecked(true);
+    checkBox_show_discogsmenu->setChecked(true);
+    checkBox_show_soundcloudmenu->setChecked(true);
+    checkBox_show_lastfmmenu->setChecked(true);
     spinBoxRowHeight->setValue(Library::kDefaultRowHeightPx);
     setLibraryFont(QApplication::font());
     searchDebouncingTimeoutSpinBox->setValue(
@@ -247,6 +250,12 @@ void DlgPrefLibrary::slotUpdate() {
 
     checkBox_show_findonwebmenu->setChecked(m_pConfig->getValue(
             ConfigKey("[Library]", "ShowFindOnWebMenu"), true));
+    checkBox_show_discogsmenu->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowFindOnDiscogsMenu"), true));
+    checkBox_show_soundcloudmenu->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowFindOnSoundcloudMenu"), true));
+    checkBox_show_lastfmmenu->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowFindOnLastfmMenu"), true));
 
     switch (m_pConfig->getValue<int>(
             kTrackDoubleClickActionConfigKey,
@@ -432,6 +441,12 @@ void DlgPrefLibrary::slotApply() {
 
     m_pConfig->set(ConfigKey("[Library]", "ShowFindOnWebMenu"),
             ConfigValue((int)checkBox_show_findonwebmenu->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowFindOnDiscogsMenu"),
+            ConfigValue((int)checkBox_show_discogsmenu->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowFindOnSoundcloudMenu"),
+            ConfigValue((int)checkBox_show_soundcloudmenu->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowFindOnLastfmMenu"),
+            ConfigValue((int)checkBox_show_lastfmmenu->isChecked()));
 
     int dbclick_status;
     if (radioButton_dbclick_bottom->isChecked()) {

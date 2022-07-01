@@ -9,29 +9,18 @@
 #include "track/track.h"
 #include "wfindonwebmenu.h"
 
-void FindOnWebMenuFactory::createFindOnWebSubmenus(
-        QMenu* pFindOnWebMenu, const Track& track) {
-    if (FindOnWebMenuFactory::serviceIsEnabled(FindOnWebMenuFactory::Service::Soundcloud)) {
+void FindOnWebMenuFactory::createFindOnWebSubmenus(QMenu* pFindOnWebMenu,
+        const Track& track,
+        bool isSoundcloudEnabled,
+        bool isDiscogsEnabled,
+        bool isLastfmEnabled) {
+    if (isSoundcloudEnabled) {
         new FindOnSoundcloudMenu(pFindOnWebMenu, track);
     }
-    if (FindOnWebMenuFactory::serviceIsEnabled(FindOnWebMenuFactory::Service::Discogs)) {
+    if (isDiscogsEnabled) {
         new FindOnDiscogsMenu(pFindOnWebMenu, track);
     }
-    if (FindOnWebMenuFactory::serviceIsEnabled(FindOnWebMenuFactory::Service::Lastfm)) {
+    if (isLastfmEnabled) {
         new FindOnLastfmMenu(pFindOnWebMenu, track);
-    }
-}
-
-bool FindOnWebMenuFactory::serviceIsEnabled(
-        Service service) { // TODO: Add feature that can be turned on-off on preferences.
-    switch (service) {
-    case Service::Soundcloud:
-        return true;
-    case Service::Discogs:
-        return true;
-    case Service::Lastfm:
-        return true;
-    default:
-        return false;
     }
 }
