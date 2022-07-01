@@ -5,12 +5,12 @@
 #include "assert.h"
 #include "track/track.h"
 
-class FindOnWeb : public QMenu {
+class WFindOnWebMenu : public QMenu {
     Q_OBJECT
   public:
-    explicit FindOnWeb(
+    explicit WFindOnWebMenu(
             QWidget* parent = nullptr);
-    ~FindOnWeb() override = default;
+    ~WFindOnWebMenu() override = default;
 
     static bool hasEntriesForTrack(const Track& track);
 

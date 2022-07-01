@@ -34,11 +34,11 @@
 #include "util/parented_ptr.h"
 #include "util/qt.h"
 #include "util/widgethelper.h"
-#include "widget/findonweb.h"
-#include "widget/findonwebfactory.h"
+#include "widget/findonwebmenufactory.h"
 #include "widget/wcolorpickeraction.h"
 #include "widget/wcoverartlabel.h"
 #include "widget/wcoverartmenu.h"
+#include "widget/wfindonwebmenu.h"
 #include "widget/wsearchrelatedtracksmenu.h"
 #include "widget/wskincolor.h"
 #include "widget/wstarrating.h"
@@ -187,20 +187,20 @@ void WTrackMenu::createMenus() {
                 });
     }
 
-    if (featureIsEnabled(Feature::FindOnOnline)) {
-        DEBUG_ASSERT(!m_pFindOnWeb);
-        m_pFindOnWeb = make_parented<FindOnWeb>(this); //¿Is it okay to have parent menu?
-        connect(m_pFindOnWeb,
+    if (featureIsEnabled(Feature::FindOnWeb)) {
+        DEBUG_ASSERT(!m_pFindOnWebMenu);
+        m_pFindOnWebMenu = make_parented<WFindOnWebMenu>(this); //¿Is it okay to have parent menu?
+        connect(m_pFindOnWebMenu,
                 &QMenu::aboutToShow,
                 this,
                 [this] {
-                    m_pFindOnWeb->clear();
+                    m_pFindOnWebMenu->clear();
                     const auto pTrack = getFirstTrackPointer();
                     if (pTrack) {
-                        FindOnWebFactory::createServiceMenus(m_pFindOnWeb, *pTrack);
+                        FindOnWebMenuFactory::createFindOnWebSubmenus(m_pFindOnWebMenu, *pTrack);
                     }
-                    m_pFindOnWeb->setEnabled(
-                            !m_pFindOnWeb->isEmpty());
+                    m_pFindOnWebMenu->setEnabled(
+                            !m_pFindOnWebMenu->isEmpty());
                 });
     }
 
@@ -556,8 +556,8 @@ void WTrackMenu::setupActions() {
         }
 
         m_pMetadataMenu->addMenu(m_pCoverMenu);
-        if (featureIsEnabled(Feature::FindOnOnline)) { // TODO: Check if Find on Web is turned on
-            m_pMetadataMenu->addMenu(m_pFindOnWeb);
+        if (featureIsEnabled(Feature::FindOnWeb)) { // TODO: Check if Find on Web is turned on
+            m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
             addSeparator();
         }
         addMenu(m_pMetadataMenu);
@@ -887,7 +887,7 @@ void WTrackMenu::updateMenus() {
     if (featureIsEnabled(Feature::FindOnWeb)) {
         const auto pTrack = getFirstTrackPointer();
         const bool enableMenu = pTrack ? WFindOnWebMenu::hasEntriesForTrack(*pTrack) : false;
-        m_pFindOnMenu->setEnabled(enableMenu);
+        m_pFindOnWebMenu->setEnabled(enableMenu);
     }
 }
 
@@ -2231,7 +2231,7 @@ bool WTrackMenu::featureIsEnabled(Feature flag) const {
         return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
     case Feature::FileBrowser:
         return true;
-    case Feature::FindOnOnline:
+    case Feature::FindOnWeb:
         return true;
     case Feature::Properties:
         return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);

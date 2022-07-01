@@ -2,10 +2,10 @@
 
 #include <QMenu>
 
-class FindOnWeb;
+class WFindOnWebMenu;
 class Track;
 
-class FindOnWebFactory {
+class FindOnWebMenuFactory {
   public:
     enum Service {
         Discogs,
@@ -13,7 +13,7 @@ class FindOnWebFactory {
         Lastfm
     };
 
-    static void createServiceMenus(QMenu* menu, const Track& track);
+    static void createFindOnWebSubmenus(QMenu* pFindOnWebMenu, const Track& track);
 
   private:
     static bool serviceIsEnabled(Service service);

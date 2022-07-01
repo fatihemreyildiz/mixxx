@@ -1,4 +1,4 @@
-#include "findonsoundcloud.h"
+#include "findonsoundcloudmenu.h"
 
 #include <QMenu>
 
@@ -15,31 +15,31 @@ const QString kSearchUrlTitle = QStringLiteral("https://soundcloud.com/search/so
 const QString kSearchUrlAlbum = QStringLiteral("https://soundcloud.com/search/albums?");
 } // namespace
 
-FindOnSoundcloud::FindOnSoundcloud(
+FindOnSoundcloudMenu::FindOnSoundcloudMenu(
         QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto m_pServiceMenu = make_parented<QMenu>(this);
-    m_pServiceMenu->setTitle(kServiceTitle);
-    pFindOnMenu->addMenu(m_pServiceMenu);
-    m_pServiceMenu->addSeparator();
+    auto pSoundcloudMenu = make_parented<QMenu>(this);
+    pSoundcloudMenu->setTitle(kServiceTitle);
+    pFindOnMenu->addMenu(pSoundcloudMenu);
+    pSoundcloudMenu->addSeparator();
     if (!artist.isEmpty()) {
-        m_pServiceMenu->addAction(composeActionText(tr("Artist"), artist),
+        pSoundcloudMenu->addAction(composeActionText(tr("Artist"), artist),
                 this,
                 [this, artist] {
                     this->openInBrowser(artist, kSearchUrlArtist);
                 });
     }
     if (!trackTitle.isEmpty()) {
-        m_pServiceMenu->addAction(composeActionText(tr("Title"), trackTitle),
+        pSoundcloudMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
                     this->openInBrowser(trackTitle, kSearchUrlTitle);
                 });
     }
     if (!album.isEmpty()) {
-        m_pServiceMenu->addAction(composeActionText(tr("Album"), album),
+        pSoundcloudMenu->addAction(composeActionText(tr("Album"), album),
                 this,
                 [this, album] {
                     this->openInBrowser(album, kSearchUrlAlbum);

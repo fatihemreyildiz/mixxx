@@ -965,11 +965,10 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/waveform/waveform.cpp
   src/waveform/waveformfactory.cpp
   src/widget/controlwidgetconnection.cpp
-  src/widget/findondiscogs.cpp
-  src/widget/findonlastfm.cpp
-  src/widget/findonsoundcloud.cpp
-  src/widget/findonweb.cpp
-  src/widget/findonwebfactory.cpp
+  src/widget/findondiscogsmenu.cpp
+  src/widget/findonlastfmmenu.cpp
+  src/widget/findonsoundcloudmenu.cpp
+  src/widget/findonwebmenufactory.cpp
   src/widget/hexspinbox.cpp
   src/widget/paintable.cpp
   src/widget/wanalysislibrarytableview.cpp
@@ -995,6 +994,7 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/widget/weffectparameternamebase.cpp
   src/widget/weffectpushbutton.cpp
   src/widget/weffectselector.cpp
+  src/widget/wfindonwebmenu.cpp
   src/widget/whotcuebutton.cpp
   src/widget/wimagestore.cpp
   src/widget/wkey.cpp

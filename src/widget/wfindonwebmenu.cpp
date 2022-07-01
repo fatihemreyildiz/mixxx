@@ -1,4 +1,4 @@
-#include "findonweb.h"
+#include "wfindonwebmenu.h"
 
 #include <QDesktopServices>
 #include <QMenu>
@@ -8,21 +8,21 @@
 #include "util/parented_ptr.h"
 #include "util/widgethelper.h" // ¿I have included this because I wanted to use DEBUG_ASSERT, If it is not correct I will delete this line in the next commit?
 
-FindOnWeb::FindOnWeb(QWidget* parent)
+WFindOnWebMenu::WFindOnWebMenu(QWidget* parent)
         : QMenu(tr("Find on Web"), parent) {
 }
 
-bool FindOnWeb::hasEntriesForTrack(const Track& track) {
+bool WFindOnWebMenu::hasEntriesForTrack(const Track& track) {
     return !(track.getArtist().isEmpty() &&
             track.getAlbum().isEmpty() &&
             track.getTitle().isEmpty());
 }
 
-QString FindOnWeb::composeActionText(const QString& prefix, const QString& trackProperty) {
+QString WFindOnWebMenu::composeActionText(const QString& prefix, const QString& trackProperty) {
     return prefix + QStringLiteral(" | ") + trackProperty;
 }
 
-void FindOnWeb::openInBrowser(const QString& query, const QString& serviceUrl) {
+void WFindOnWebMenu::openInBrowser(const QString& query, const QString& serviceUrl) {
     QUrlQuery urlQuery;
     urlQuery.addQueryItem("q", query);
     QUrl url(serviceUrl);
@@ -33,7 +33,7 @@ void FindOnWeb::openInBrowser(const QString& query, const QString& serviceUrl) {
     }
 }
 
-void FindOnWeb::openInBrowser(const QString& query,
+void WFindOnWebMenu::openInBrowser(const QString& query,
         const QString& queryType,
         const QString& serviceUrl) {
     QUrlQuery urlQuery;
