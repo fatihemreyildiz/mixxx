@@ -43,61 +43,6 @@
 #include "widget/wstarrating.h"
 #include "widget/wwidget.h"
 
-namespace {
-const ConfigKey kShowAutoDJ{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowAutoDJ")};
-
-const ConfigKey kShowLoadTo{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowLoadTo")};
-
-const ConfigKey kShowPlaylist{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowPlaylist")};
-
-const ConfigKey kShowCrate{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowCrate")};
-
-const ConfigKey kShowRemove{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowRemove")};
-
-const ConfigKey kShowMetadata{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowMetadata")};
-
-const ConfigKey kShowReset{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowReset")};
-
-const ConfigKey kShowBPM{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowBPM")};
-
-const ConfigKey kShowColor{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowColor")};
-
-const ConfigKey kShowFileBrowser{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowFileBrowser")};
-
-const ConfigKey kShowProperties{
-        QStringLiteral("[Library]"),
-        QStringLiteral("ShowProperties")};
-
-const ConfigKey kSearchRelated{
-        QStringLiteral("[Library]"),
-        QStringLiteral("SearchRelated")};
-
-const ConfigKey kFindOnWeb{
-        QStringLiteral("[Library]"),
-        QStringLiteral("FindOnWeb")};
-
-} // anonymous namespace
-
 WTrackMenu::WTrackMenu(
         QWidget* parent,
         UserSettingsPointer pConfig,
@@ -249,7 +194,9 @@ void WTrackMenu::createMenus() {
 
 void WTrackMenu::createActions() {
     const auto hideRemoveKeySequence =
-            QKeySequence(kHideRemoveShortcutModifier | kHideRemoveShortcutKey);
+            // TODO(XXX): Qt6 replace enum | with QKeyCombination
+            QKeySequence(static_cast<int>(kPropertiesShortcutModifier) |
+                    kPropertiesShortcutKey);
 
     if (featureIsEnabled(Feature::AutoDJ)) {
         m_pAutoDJBottomAct = new QAction(tr("Add to Auto DJ Queue (bottom)"), this);
@@ -314,7 +261,10 @@ void WTrackMenu::createActions() {
         // The keypress is caught in WTrackTableView::keyPressEvent
         if (m_pTrackModel) {
             m_pPropertiesAct->setShortcut(
-                    QKeySequence(kPropertiesShortcutModifier | kPropertiesShortcutKey));
+                    // TODO(XXX): Qt6 replace enum | with QKeyCombination
+                    QKeySequence(
+                            static_cast<int>(kPropertiesShortcutModifier) |
+                            kPropertiesShortcutKey));
         }
         connect(m_pPropertiesAct, &QAction::triggered, this, &WTrackMenu::slotShowDlgTrackInfo);
     }
@@ -486,9 +436,70 @@ void WTrackMenu::createActions() {
     }
 }
 
+namespace {
+const ConfigKey kShowAutoDJ{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowAutoDJ")};
+
+const ConfigKey kShowLoadTo{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowLoadTo")};
+
+const ConfigKey kShowPlaylist{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowPlaylist")};
+
+const ConfigKey kShowCrate{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowCrate")};
+
+const ConfigKey kShowRemove{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowRemove")};
+
+const ConfigKey kShowMetadata{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowMetadata")};
+
+const ConfigKey kShowReset{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowReset")};
+
+const ConfigKey kShowBPM{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowBPM")};
+
+const ConfigKey kShowColor{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowColor")};
+
+const ConfigKey kShowFileBrowser{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowFileBrowser")};
+
+const ConfigKey kShowProperties{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowProperties")};
+
+const ConfigKey kShowSearchRelated{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowSearchRelated")};
+
+const ConfigKey kShowAnalyze{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowAnalyze")};
+
+const ConfigKey kShowHideUnhidePurge{
+        QStringLiteral("[Library]"),
+        QStringLiteral("ShowHideUnhidePurge")};
+
+} // anonymous namespace
+
 void WTrackMenu::setupActions() {
     if (featureIsEnabled(Feature::SearchRelated)) {
-        addMenu(m_pSearchRelatedMenu);
+        if (m_pConfig->getValue<bool>(kShowSearchRelated)) {
+            addMenu(m_pSearchRelatedMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::SelectInLibrary)) {
@@ -501,123 +512,143 @@ void WTrackMenu::setupActions() {
     }
 
     if (featureIsEnabled(Feature::AutoDJ)) {
-        addAction(m_pAutoDJBottomAct);
-        addAction(m_pAutoDJTopAct);
-        addAction(m_pAutoDJReplaceAct);
-        addSeparator();
+        if (m_pConfig->getValue<bool>(kShowAutoDJ)) {
+            addAction(m_pAutoDJBottomAct);
+            addAction(m_pAutoDJTopAct);
+            addAction(m_pAutoDJReplaceAct);
+            addSeparator();
+        }
     }
 
     if (featureIsEnabled(Feature::LoadTo)) {
-        m_pLoadToMenu->addMenu(m_pDeckMenu);
+        if (m_pConfig->getValue<bool>(kShowLoadTo)) {
+            m_pLoadToMenu->addMenu(m_pDeckMenu);
 
-        m_pLoadToMenu->addMenu(m_pSamplerMenu);
+            m_pLoadToMenu->addMenu(m_pSamplerMenu);
 
-        if (m_pNumPreviewDecks->get() > 0.0) {
-            m_pLoadToMenu->addAction(m_pAddToPreviewDeck);
+            if (m_pNumPreviewDecks->get() > 0.0) {
+                m_pLoadToMenu->addAction(m_pAddToPreviewDeck);
+            }
+
+            addMenu(m_pLoadToMenu);
+            addSeparator();
         }
-
-        addMenu(m_pLoadToMenu);
-        addSeparator();
     }
 
     if (featureIsEnabled(Feature::Playlist)) {
-        addMenu(m_pPlaylistMenu);
+        if (m_pConfig->getValue<bool>(kShowPlaylist)) {
+            addMenu(m_pPlaylistMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Crate)) {
-        addMenu(m_pCrateMenu);
+        if (m_pConfig->getValue<bool>(kShowCrate)) {
+            addMenu(m_pCrateMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Remove)) {
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Remove)) {
-            addAction(m_pRemoveAct);
-        }
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::RemovePlaylist)) {
-            addAction(m_pRemovePlaylistAct);
-        }
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveCrate)) {
-            addAction(m_pRemoveCrateAct);
+        if (m_pConfig->getValue<bool>(kShowRemove)) {
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Remove)) {
+                addAction(m_pRemoveAct);
+            }
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::RemovePlaylist)) {
+                addAction(m_pRemovePlaylistAct);
+            }
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveCrate)) {
+                addAction(m_pRemoveCrateAct);
+            }
         }
     }
 
     addSeparator();
 
     if (featureIsEnabled(Feature::BPM)) {
-        m_pBPMMenu->addAction(m_pBpmDoubleAction);
-        m_pBPMMenu->addAction(m_pBpmHalveAction);
-        m_pBPMMenu->addAction(m_pBpmTwoThirdsAction);
-        m_pBPMMenu->addAction(m_pBpmThreeFourthsAction);
-        m_pBPMMenu->addAction(m_pBpmFourThirdsAction);
-        m_pBPMMenu->addAction(m_pBpmThreeHalvesAction);
-        m_pBPMMenu->addSeparator();
-        m_pBPMMenu->addAction(m_pBpmLockAction);
-        m_pBPMMenu->addAction(m_pBpmUnlockAction);
-        m_pBPMMenu->addSeparator();
-        m_pBPMMenu->addAction(m_pBpmResetAction);
-        m_pBPMMenu->addSeparator();
+        if (m_pConfig->getValue<bool>(kShowBPM)) {
+            m_pBPMMenu->addAction(m_pBpmDoubleAction);
+            m_pBPMMenu->addAction(m_pBpmHalveAction);
+            m_pBPMMenu->addAction(m_pBpmTwoThirdsAction);
+            m_pBPMMenu->addAction(m_pBpmThreeFourthsAction);
+            m_pBPMMenu->addAction(m_pBpmFourThirdsAction);
+            m_pBPMMenu->addAction(m_pBpmThreeHalvesAction);
+            m_pBPMMenu->addSeparator();
+            m_pBPMMenu->addAction(m_pBpmLockAction);
+            m_pBPMMenu->addAction(m_pBpmUnlockAction);
+            m_pBPMMenu->addSeparator();
+            m_pBPMMenu->addAction(m_pBpmResetAction);
+            m_pBPMMenu->addSeparator();
 
-        addMenu(m_pBPMMenu);
+            addMenu(m_pBPMMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Color)) {
-        m_pColorMenu->addAction(m_pColorPickerAction);
-        addMenu(m_pColorMenu);
+        if (m_pConfig->getValue<bool>(kShowColor)) {
+            m_pColorMenu->addAction(m_pColorPickerAction);
+            addMenu(m_pColorMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Metadata)) {
-        m_pMetadataMenu->addAction(m_pImportMetadataFromFileAct);
-        m_pMetadataMenu->addAction(m_pImportMetadataFromMusicBrainzAct);
-        m_pMetadataMenu->addAction(m_pExportMetadataAct);
+        if (m_pConfig->getValue<bool>(kShowMetadata)) {
+            m_pMetadataMenu->addAction(m_pImportMetadataFromFileAct);
+            m_pMetadataMenu->addAction(m_pImportMetadataFromMusicBrainzAct);
+            m_pMetadataMenu->addAction(m_pExportMetadataAct);
 
-        for (const auto& updateInExternalTrackCollection :
-                qAsConst(m_updateInExternalTrackCollections)) {
-            m_pMetadataUpdateExternalCollectionsMenu->addAction(
-                    updateInExternalTrackCollection.action);
-        }
-        if (!m_pMetadataUpdateExternalCollectionsMenu->isEmpty()) {
-            m_pMetadataMenu->addMenu(m_pMetadataUpdateExternalCollectionsMenu);
-            // Enable/disable entries depending on the connection status
-            // that may change at runtime.
-            connect(m_pMetadataUpdateExternalCollectionsMenu,
-                    &QMenu::aboutToShow,
-                    this,
-                    [this] {
-                        for (const auto& updateInExternalTrackCollection :
-                                qAsConst(m_updateInExternalTrackCollections)) {
-                            updateInExternalTrackCollection.action->setEnabled(
-                                    updateInExternalTrackCollection
-                                            .externalTrackCollection
-                                            ->isConnected());
-                        }
-                    });
-        }
+            for (const auto& updateInExternalTrackCollection :
+                    qAsConst(m_updateInExternalTrackCollections)) {
+                m_pMetadataUpdateExternalCollectionsMenu->addAction(
+                        updateInExternalTrackCollection.action);
+            }
+            if (!m_pMetadataUpdateExternalCollectionsMenu->isEmpty()) {
+                m_pMetadataMenu->addMenu(m_pMetadataUpdateExternalCollectionsMenu);
+                // Enable/disable entries depending on the connection status
+                // that may change at runtime.
+                connect(m_pMetadataUpdateExternalCollectionsMenu,
+                        &QMenu::aboutToShow,
+                        this,
+                        [this] {
+                            for (const auto& updateInExternalTrackCollection :
+                                    qAsConst(m_updateInExternalTrackCollections)) {
+                                updateInExternalTrackCollection.action->setEnabled(
+                                        updateInExternalTrackCollection
+                                                .externalTrackCollection
+                                                ->isConnected());
+                            }
+                        });
+            }
 
-        m_pMetadataMenu->addMenu(m_pCoverMenu);
-        addMenu(m_pMetadataMenu);
+            m_pMetadataMenu->addMenu(m_pCoverMenu);
+            addMenu(m_pMetadataMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Reset)) {
-        m_pClearMetadataMenu->addAction(m_pClearBeatsAction);
-        m_pClearMetadataMenu->addAction(m_pClearPlayCountAction);
-        m_pClearMetadataMenu->addAction(m_pClearRatingAction);
-        m_pClearMetadataMenu->addAction(m_pClearCommentAction);
-        m_pClearMetadataMenu->addAction(m_pClearMainCueAction);
-        m_pClearMetadataMenu->addAction(m_pClearHotCuesAction);
-        m_pClearMetadataMenu->addAction(m_pClearIntroCueAction);
-        m_pClearMetadataMenu->addAction(m_pClearOutroCueAction);
-        m_pClearMetadataMenu->addAction(m_pClearLoopsAction);
-        m_pClearMetadataMenu->addAction(m_pClearKeyAction);
-        m_pClearMetadataMenu->addAction(m_pClearReplayGainAction);
-        m_pClearMetadataMenu->addAction(m_pClearWaveformAction);
-        m_pClearMetadataMenu->addSeparator();
-        m_pClearMetadataMenu->addAction(m_pClearAllMetadataAction);
-        addMenu(m_pClearMetadataMenu);
+        if (m_pConfig->getValue<bool>(kShowReset)) {
+            m_pClearMetadataMenu->addAction(m_pClearBeatsAction);
+            m_pClearMetadataMenu->addAction(m_pClearPlayCountAction);
+            m_pClearMetadataMenu->addAction(m_pClearRatingAction);
+            m_pClearMetadataMenu->addAction(m_pClearCommentAction);
+            m_pClearMetadataMenu->addAction(m_pClearMainCueAction);
+            m_pClearMetadataMenu->addAction(m_pClearHotCuesAction);
+            m_pClearMetadataMenu->addAction(m_pClearIntroCueAction);
+            m_pClearMetadataMenu->addAction(m_pClearOutroCueAction);
+            m_pClearMetadataMenu->addAction(m_pClearLoopsAction);
+            m_pClearMetadataMenu->addAction(m_pClearKeyAction);
+            m_pClearMetadataMenu->addAction(m_pClearReplayGainAction);
+            m_pClearMetadataMenu->addAction(m_pClearWaveformAction);
+            m_pClearMetadataMenu->addSeparator();
+            m_pClearMetadataMenu->addAction(m_pClearAllMetadataAction);
+            addMenu(m_pClearMetadataMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::Analyze)) {
-        m_pAnalyzeMenu->addAction(m_pAnalyzeAction);
-        m_pAnalyzeMenu->addAction(m_pReanalyzeAction);
-        addMenu(m_pAnalyzeMenu);
+        if (m_pConfig->getValue<bool>(kShowAnalyze)) {
+            m_pAnalyzeMenu->addAction(m_pAnalyzeAction);
+            m_pAnalyzeMenu->addAction(m_pReanalyzeAction);
+            addMenu(m_pAnalyzeMenu);
+        }
     }
 
     // This action is created only for menus instantiated by deck widgets (e.g.
@@ -629,29 +660,37 @@ void WTrackMenu::setupActions() {
     addSeparator();
 
     if (featureIsEnabled(Feature::HideUnhidePurge)) {
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide)) {
-            addAction(m_pHideAct);
-        }
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide)) {
-            addAction(m_pUnhideAct);
-        }
-        if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge)) {
-            addAction(m_pPurgeAct);
+        if (m_pConfig->getValue<bool>(kShowHideUnhidePurge)) {
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide)) {
+                addAction(m_pHideAct);
+            }
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide)) {
+                addAction(m_pUnhideAct);
+            }
+            if (m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge)) {
+                addAction(m_pPurgeAct);
+            }
         }
     }
 
     if (featureIsEnabled(Feature::RemoveFromDisk)) {
-        m_pRemoveFromDiskMenu->addAction(m_pRemoveFromDiskAct);
-        addMenu(m_pRemoveFromDiskMenu);
+        if (m_pConfig->getValue<bool>(kShowRemove)) {
+            m_pRemoveFromDiskMenu->addAction(m_pRemoveFromDiskAct);
+            addMenu(m_pRemoveFromDiskMenu);
+        }
     }
 
     if (featureIsEnabled(Feature::FileBrowser)) {
-        addAction(m_pFileBrowserAct);
+        if (m_pConfig->getValue<bool>(kShowFileBrowser)) {
+            addAction(m_pFileBrowserAct);
+        }
     }
 
     if (featureIsEnabled(Feature::Properties)) {
-        addSeparator();
-        addAction(m_pPropertiesAct);
+        if (m_pConfig->getValue<bool>(kShowProperties)) {
+            addSeparator();
+            addAction(m_pPropertiesAct);
+        }
     }
 }
 
@@ -2216,144 +2255,52 @@ bool WTrackMenu::featureIsEnabled(Feature flag) const {
     }
 
     switch (flag) {
-    case Feature::AutoDJ: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowAutoDJ);
-        if (isFeatureEnabled)
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::AddToAutoDJ);
-        else
-            return false;
-    }
-    case Feature::LoadTo: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowLoadTo);
-        if (isFeatureEnabled)
-            return m_pTrackModel->hasCapabilities(
-                           TrackModel::Capability::LoadToDeck) ||
-                    m_pTrackModel->hasCapabilities(
-                            TrackModel::Capability::LoadToSampler) ||
-                    m_pTrackModel->hasCapabilities(
-                            TrackModel::Capability::LoadToPreviewDeck);
-        else
-            return false;
-    }
-    case Feature::Playlist: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowPlaylist);
-        if (isFeatureEnabled) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    case Feature::Crate: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowCrate);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(
-                    TrackModel::Capability::AddToTrackSet);
-        } else {
-            return false;
-        }
-    }
-
-    case Feature::Remove: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowRemove);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(
-                           TrackModel::Capability::Remove) ||
-                    m_pTrackModel->hasCapabilities(
-                            TrackModel::Capability::RemovePlaylist) ||
-                    m_pTrackModel->hasCapabilities(
-                            TrackModel::Capability::RemoveCrate);
-        } else
-            return false;
-    }
-
-    case Feature::Metadata: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowMetadata);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-
-        } else
-            return false;
-    }
-
-    case Feature::Analyze: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowMetadata);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(
-                    TrackModel::Capability::EditMetadata |
-                    TrackModel::Capability::Analyze);
-        } else
-            return false;
-    }
-
-    case Feature::Reset: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowReset);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(
-                    TrackModel::Capability::EditMetadata |
-                    TrackModel::Capability::ResetPlayed);
-        } else
-            return false;
-    }
-
-    case Feature::BPM: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowBPM);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-        } else
-            return false;
-    }
-
-    case Feature::Color: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowColor);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-        } else
-            return false;
-    }
-
-    case Feature::HideUnhidePurge: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowFileBrowser); //
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide) ||
-                    m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide) ||
-                    m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge);
-        } else
-            return false;
-    }
-
-    case Feature::RemoveFromDisk: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowRemove);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
-        } else
-            return false;
-    }
-
-    case Feature::FileBrowser: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowFileBrowser);
-        if (isFeatureEnabled) {
-            return true;
-        } else
-            return false;
-    }
+    case Feature::AutoDJ:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::AddToAutoDJ);
+    case Feature::LoadTo:
+        return m_pTrackModel->hasCapabilities(
+                       TrackModel::Capability::LoadToDeck) ||
+                m_pTrackModel->hasCapabilities(
+                        TrackModel::Capability::LoadToSampler) ||
+                m_pTrackModel->hasCapabilities(
+                        TrackModel::Capability::LoadToPreviewDeck);
+    case Feature::Playlist:
+    case Feature::Crate:
+        return m_pTrackModel->hasCapabilities(
+                TrackModel::Capability::AddToTrackSet);
+    case Feature::Remove:
+        return m_pTrackModel->hasCapabilities(
+                       TrackModel::Capability::Remove) ||
+                m_pTrackModel->hasCapabilities(
+                        TrackModel::Capability::RemovePlaylist) ||
+                m_pTrackModel->hasCapabilities(
+                        TrackModel::Capability::RemoveCrate);
+    case Feature::Metadata:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+    case Feature::Analyze:
+        return m_pTrackModel->hasCapabilities(
+                TrackModel::Capability::EditMetadata |
+                TrackModel::Capability::Analyze);
+    case Feature::Reset:
+        return m_pTrackModel->hasCapabilities(
+                TrackModel::Capability::EditMetadata |
+                TrackModel::Capability::ResetPlayed);
+    case Feature::BPM:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+    case Feature::Color:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+    case Feature::HideUnhidePurge:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::Hide) ||
+                m_pTrackModel->hasCapabilities(TrackModel::Capability::Unhide) ||
+                m_pTrackModel->hasCapabilities(TrackModel::Capability::Purge);
+    case Feature::RemoveFromDisk:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::RemoveFromDisk);
+    case Feature::FileBrowser:
         return true;
-    case Feature::Properties: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kShowProperties);
-        if (isFeatureEnabled) {
-            return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
-        } else
-            return false;
-    }
-
-    case Feature::SearchRelated: {
-        bool isFeatureEnabled = m_pConfig->getValue<bool>(kSearchRelated);
-        if (isFeatureEnabled) {
-            return m_pLibrary != nullptr;
-        } else
-            return false;
-    }
-
+    case Feature::Properties:
+        return m_pTrackModel->hasCapabilities(TrackModel::Capability::EditMetadata);
+    case Feature::SearchRelated:
+        return m_pLibrary != nullptr;
     case Feature::SelectInLibrary:
         return m_pTrack != nullptr;
     default:

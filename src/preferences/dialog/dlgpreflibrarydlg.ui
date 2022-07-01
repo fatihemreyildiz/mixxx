@@ -579,9 +579,19 @@
        </widget>
       </item>
         <item row="4" column="0">
-       <widget class="QCheckBox" name="checkBox_show_find_on_web">
+       <widget class="QCheckBox" name="checkBox_show_analyze">
         <property name="text">
-         <string>Find on Web (Not yet implemented)</string>
+         <string>Analyze</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+              <item row="4" column="1">
+       <widget class="QCheckBox" name="checkBox_show_hideunhidepurge">
+        <property name="text">
+         <string>Hide from Library</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -591,7 +601,7 @@
       <item row="5" column="0">
        <widget class="QLabel" name="label_track_menu">
         <property name="text">
-         <string>Editable TrackMenu Draft</string>
+         <string>All Trackmenu Features can be turned on or off.</string>
         </property>
         <property name="topMargin">
          <number>10</number>
@@ -715,7 +725,8 @@
   <tabstop>checkBox_show_file_browser</tabstop>
   <tabstop>checkBox_show_properties</tabstop>
   <tabstop>checkBox_show_search_related</tabstop>
-  <tabstop>checkBox_show_find_on_web</tabstop>
+  <tabstop>checkBox_show_analyze</tabstop>
+  <tabstop>checkBox_show_hideunhidepurge</tabstop>
   <tabstop>PushButtonOpenSettingsDir</tabstop>
  </tabstops>
  <resources/>

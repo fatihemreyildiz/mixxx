@@ -214,7 +214,8 @@ void DlgPrefLibrary::slotResetToDefaults() {
     checkBox_show_file_browser->setChecked(true);
     checkBox_show_properties->setChecked(true);
     checkBox_show_search_related->setChecked(true);
-    checkBox_show_find_on_web->setChecked(true);
+    checkBox_show_analyze->setChecked(true);
+    checkBox_show_hideunhidepurge->setChecked(true);
     checkBoxEditMetadataSelectedClicked->setChecked(kEditMetadataSelectedClickDefault);
     radioButton_dbclick_bottom->setChecked(false);
     radioButton_dbclick_top->setChecked(false);
@@ -280,9 +281,11 @@ void DlgPrefLibrary::slotUpdate() {
     checkBox_show_properties->setChecked(m_pConfig->getValue(
             ConfigKey("[Library]", "ShowProperties"), true));
     checkBox_show_search_related->setChecked(m_pConfig->getValue(
-            ConfigKey("[Library]", "SearchRelated"), true));
-    checkBox_show_find_on_web->setChecked(m_pConfig->getValue(
-            ConfigKey("[Library]", "FindOnWeb"), true));
+            ConfigKey("[Library]", "ShowSearchRelated"), true));
+    checkBox_show_analyze->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowAnalyze"), true));
+    checkBox_show_hideunhidepurge->setChecked(m_pConfig->getValue(
+            ConfigKey("[Library]", "ShowHideUnhidePurge"), true));
 
     switch (m_pConfig->getValue<int>(
             kTrackDoubleClickActionConfigKey,
@@ -488,10 +491,12 @@ void DlgPrefLibrary::slotApply() {
             ConfigValue((int)checkBox_show_file_browser->isChecked()));
     m_pConfig->set(ConfigKey("[Library]", "ShowProperties"),
             ConfigValue((int)checkBox_show_properties->isChecked()));
-    m_pConfig->set(ConfigKey("[Library]", "SearchRelated"),
+    m_pConfig->set(ConfigKey("[Library]", "ShowSearchRelated"),
             ConfigValue((int)checkBox_show_search_related->isChecked()));
-    m_pConfig->set(ConfigKey("[Library]", "FindOnWeb"),
-            ConfigValue((int)checkBox_show_find_on_web->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowAnalyze"),
+            ConfigValue((int)checkBox_show_analyze->isChecked()));
+    m_pConfig->set(ConfigKey("[Library]", "ShowHideUnhidePurge"),
+            ConfigValue((int)checkBox_show_hideunhidepurge->isChecked()));
 
     int dbclick_status;
     if (radioButton_dbclick_bottom->isChecked()) {
