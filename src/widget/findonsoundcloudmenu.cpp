@@ -20,7 +20,7 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pSoundcloudMenu = make_parented<QMenu>(this);
+    auto pSoundcloudMenu = make_parented<QMenu>(pFindOnMenu);
     pSoundcloudMenu->setTitle(kServiceTitle);
     pFindOnMenu->addMenu(pSoundcloudMenu);
     pSoundcloudMenu->addSeparator();

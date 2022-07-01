@@ -19,7 +19,7 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pLastfmMenu = make_parented<QMenu>(this);
+    auto pLastfmMenu = make_parented<QMenu>(pFindOnMenu);
     pLastfmMenu->setTitle(kServiceTitle);
     pFindOnMenu->addMenu(pLastfmMenu);
     pLastfmMenu->addSeparator();

@@ -20,7 +20,7 @@ FindOnDiscogsMenu::FindOnDiscogsMenu(QMenu* pFindOnMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pDiscogsMenu = make_parented<QMenu>(this);
+    auto pDiscogsMenu = make_parented<QMenu>(pFindOnMenu);
     pDiscogsMenu->setTitle(kServiceTitle);
     pFindOnMenu->addMenu(pDiscogsMenu);
     addSeparator();
