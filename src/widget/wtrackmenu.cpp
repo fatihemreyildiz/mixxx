@@ -196,23 +196,10 @@ void WTrackMenu::createMenus() {
                 [this] {
                     m_pFindOnWebMenu->clear();
                     const auto pTrack = getFirstTrackPointer();
-                    bool isSoundcloudEnabled = m_pConfig->getValue<bool>(
-                            ConfigKey(QStringLiteral("[Library]"),
-                                    QStringLiteral("ShowFindOnSoundcloudMenu")));
-                    bool isDiscogsEnabled = m_pConfig->getValue<bool>(
-                            ConfigKey(QStringLiteral("[Library]"),
-                                    QStringLiteral("ShowFindOnDiscogsMenu")));
-                    bool isLastfmEnabled = m_pConfig->getValue<bool>(
-                            ConfigKey(QStringLiteral("[Library]"),
-                                    QStringLiteral("ShowFindOnLastfmMenu")));
-
                     if (pTrack) {
                         FindOnWebMenuFactory::createFindOnWebSubmenus(
                                 m_pFindOnWebMenu,
-                                *pTrack,
-                                isSoundcloudEnabled,
-                                isDiscogsEnabled,
-                                isLastfmEnabled);
+                                *pTrack);
                     }
                     m_pFindOnWebMenu->setEnabled(
                             !m_pFindOnWebMenu->isEmpty());
@@ -577,9 +564,9 @@ void WTrackMenu::setupActions() {
                             QStringLiteral("ShowFindOnWebMenu")));
             if (isFindOnWebMenuEnabled) {
                 m_pMetadataMenu->addMenu(m_pFindOnWebMenu);
-                addSeparator();
             }
         }
+        addSeparator();
         addMenu(m_pMetadataMenu);
     }
 

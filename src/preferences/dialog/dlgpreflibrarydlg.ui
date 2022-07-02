@@ -471,51 +471,14 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_description_show_findonwebmenu">
         <property name="text">
-         <string>Disabling Find On Web will not populate any menu.</string>
+         <string>Disabling Find On Web will not populate the menu.</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_description_findonweb_2">
         <property name="text">
-         <string>You will need to restart Mixxx for Find On Web menu.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="label_description_findonweb_3">
-        <property name="text">
-         <string>Online Services</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="checkBox_show_discogsmenu">
-        <property name="text">
-         <string>Discogs</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QCheckBox" name="checkBox_show_soundcloudmenu">
-        <property name="text">
-         <string>Soundcloud</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="QCheckBox" name="checkBox_show_lastfmmenu">
-        <property name="text">
-         <string>Lastfm</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>You will need to restart Mixxx for to turn on/off the Find on web menu.</string>
         </property>
        </widget>
       </item>
@@ -618,9 +581,6 @@
   <tabstop>checkBox_show_rekordbox</tabstop>
   <tabstop>checkBox_show_serato</tabstop>
   <tabstop>checkBox_show_findonwebmenu</tabstop>
-  <tabstop>checkBox_show_discogsmenu</tabstop>
-  <tabstop>checkBox_show_soundcloudmenu</tabstop>
-  <tabstop>checkBox_show_lastfmmenu</tabstop>
   <tabstop>PushButtonOpenSettingsDir</tabstop>
  </tabstops>
  <resources/>
