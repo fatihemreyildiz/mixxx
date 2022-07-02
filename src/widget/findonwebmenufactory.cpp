@@ -15,12 +15,14 @@ void FindOnWebMenuFactory::createFindOnWebSubmenus(QMenu* pFindOnWebMenu,
         bool isDiscogsEnabled,
         bool isLastfmEnabled) {
     if (isSoundcloudEnabled) {
-        new FindOnSoundcloudMenu(pFindOnWebMenu, track);
+        auto pSoundCloudMenu = make_parented<QMenu>(
+                new FindOnSoundcloudMenu(pFindOnWebMenu, track));
     }
     if (isDiscogsEnabled) {
-        new FindOnDiscogsMenu(pFindOnWebMenu, track);
+        auto pFindOnDiscogsMenu = make_parented<QMenu>(
+                new FindOnDiscogsMenu(pFindOnWebMenu, track));
     }
     if (isLastfmEnabled) {
-        new FindOnLastfmMenu(pFindOnWebMenu, track);
+        auto pFindOnLastFmMenu = make_parented<QMenu>(new FindOnLastfmMenu(pFindOnWebMenu, track));
     }
 }
