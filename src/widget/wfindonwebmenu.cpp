@@ -6,7 +6,7 @@
 #include <QtDebug>
 
 #include "util/parented_ptr.h"
-#include "util/widgethelper.h" // ¿I have included this because I wanted to use DEBUG_ASSERT, If it is not correct I will delete this line in the next commit?
+#include "util/widgethelper.h"
 
 WFindOnWebMenu::WFindOnWebMenu(QWidget* parent)
         : QMenu(tr("Find on Web"), parent) {

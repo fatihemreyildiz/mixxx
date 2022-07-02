@@ -189,7 +189,7 @@ void WTrackMenu::createMenus() {
 
     if (featureIsEnabled(Feature::FindOnWeb)) {
         DEBUG_ASSERT(!m_pFindOnWebMenu);
-        m_pFindOnWebMenu = make_parented<WFindOnWebMenu>(this); //¿Is it okay to have parent menu?
+        m_pFindOnWebMenu = make_parented<WFindOnWebMenu>(this);
         connect(m_pFindOnWebMenu,
                 &QMenu::aboutToShow,
                 this,

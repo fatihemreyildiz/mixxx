@@ -2,7 +2,6 @@
 
 #include <QMenu>
 
-#include "assert.h"
 #include "track/track.h"
 
 class WFindOnWebMenu : public QMenu {

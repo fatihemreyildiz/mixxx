@@ -2,7 +2,6 @@
 
 #include <QMenu>
 
-class WFindOnWebMenu;
 class Track;
 
 class FindOnWebMenuFactory {
