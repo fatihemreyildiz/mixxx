@@ -452,40 +452,6 @@
     </widget>
    </item>
 
-    <item>
-    <widget class="QGroupBox" name="groupBox_findonweb_services">
-     <property name="title">
-      <string>Find On Web Menu - Menu For to Find Track Properties in Online Music Databases</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_findonweb_services">
-    <item row="0" column="0">
-       <widget class="QCheckBox" name="checkBox_show_findonwebmenu">
-        <property name="text">
-         <string>Find On Web</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_description_show_findonwebmenu">
-        <property name="text">
-         <string>Disabling Find On Web will not populate the menu.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_description_findonweb_2">
-        <property name="text">
-         <string>You will need to restart Mixxx for to turn on/off the Find on web menu.</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-
    <item>
     <widget class="QGroupBox" name="groupBox_settingsDir">
      <property name="title">
@@ -580,7 +546,6 @@
   <tabstop>checkBox_show_traktor</tabstop>
   <tabstop>checkBox_show_rekordbox</tabstop>
   <tabstop>checkBox_show_serato</tabstop>
-  <tabstop>checkBox_show_findonwebmenu</tabstop>
   <tabstop>PushButtonOpenSettingsDir</tabstop>
  </tabstops>
  <resources/>
