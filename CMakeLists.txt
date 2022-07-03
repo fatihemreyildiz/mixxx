@@ -965,10 +965,10 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/waveform/waveform.cpp
   src/waveform/waveformfactory.cpp
   src/widget/controlwidgetconnection.cpp
-  src/widget/findondiscogsmenu.cpp
-  src/widget/findonlastfmmenu.cpp
-  src/widget/findonsoundcloudmenu.cpp
   src/widget/findonwebmenufactory.cpp
+  src/widget/findonwebmenuservices/findondiscogsmenu.cpp
+  src/widget/findonwebmenuservices/findonlastfmmenu.cpp
+  src/widget/findonwebmenuservices/findonsoundcloudmenu.cpp
   src/widget/hexspinbox.cpp
   src/widget/paintable.cpp
   src/widget/wanalysislibrarytableview.cpp

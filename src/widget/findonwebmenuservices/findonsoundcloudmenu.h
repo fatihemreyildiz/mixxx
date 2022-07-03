@@ -1,7 +1,7 @@
 #pragma once
 
 #include "util/parented_ptr.h"
-#include "wfindonwebmenu.h"
+#include "widget/wfindonwebmenu.h"
 
 class FindOnSoundcloudMenu : public WFindOnWebMenu {
   public:

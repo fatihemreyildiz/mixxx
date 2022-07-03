@@ -2,9 +2,9 @@
 
 #include <QMenu>
 
-#include "findondiscogsmenu.h"
-#include "findonlastfmmenu.h"
-#include "findonsoundcloudmenu.h"
+#include "findonwebmenuservices/findondiscogsmenu.h"
+#include "findonwebmenuservices/findonlastfmmenu.h"
+#include "findonwebmenuservices/findonsoundcloudmenu.h"
 
 void FindOnWebMenuFactory::createFindOnWebSubmenus(QMenu* pFindOnWebMenu,
         const Track& track) {
