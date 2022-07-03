@@ -1,4 +1,4 @@
-#include "findondiscogsmenu.h"
+#include "findonwebmenudiscogs.h"
 
 #include <QMenu>
 
@@ -16,13 +16,13 @@ const QString kSearchUrl = QStringLiteral(
         "https://www.discogs.com/search/?");
 } //namespace
 
-FindOnDiscogsMenu::FindOnDiscogsMenu(QMenu* pFindOnMenu, const Track& track) {
+FindOnWebMenuDiscogs::FindOnWebMenuDiscogs(QMenu* pFindOnWebMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pDiscogsMenu = make_parented<QMenu>(pFindOnMenu);
+    auto pDiscogsMenu = make_parented<QMenu>(pFindOnWebMenu);
     pDiscogsMenu->setTitle(kServiceTitle);
-    pFindOnMenu->addMenu(pDiscogsMenu);
+    pFindOnWebMenu->addMenu(pDiscogsMenu);
     addSeparator();
     if (!artist.isEmpty()) {
         pDiscogsMenu->addAction(composeActionText(tr("Artist"), artist),

@@ -2,17 +2,18 @@
 
 #include <QMenu>
 
-#include "findonwebmenuservices/findondiscogsmenu.h"
-#include "findonwebmenuservices/findonlastfmmenu.h"
-#include "findonwebmenuservices/findonsoundcloudmenu.h"
+#include "findonwebmenuservices/findonwebmenudiscogs.h"
+#include "findonwebmenuservices/findonwebmenulastfm.h"
+#include "findonwebmenuservices/findonwebmenusoundcloud.h"
 
 void FindOnWebMenuFactory::createFindOnWebSubmenus(QMenu* pFindOnWebMenu,
         const Track& track) {
-    auto pSoundCloudMenu = make_parented<QMenu>(
-            new FindOnSoundcloudMenu(pFindOnWebMenu, track));
+    auto pFindOnWebMenuSoundcloud = make_parented<QMenu>(
+            new FindOnWebMenuSoundcloud(pFindOnWebMenu, track));
 
-    auto pFindOnDiscogsMenu = make_parented<QMenu>(
-            new FindOnDiscogsMenu(pFindOnWebMenu, track));
+    auto pFindOnWebMenuDiscogs = make_parented<QMenu>(
+            new FindOnWebMenuDiscogs(pFindOnWebMenu, track));
 
-    auto pFindOnLastFmMenu = make_parented<QMenu>(new FindOnLastfmMenu(pFindOnWebMenu, track));
+    auto pFindOnWebMenuLastfm = make_parented<QMenu>(
+            new FindOnWebMenuLastfm(pFindOnWebMenu, track));
 }

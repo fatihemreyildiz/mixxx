@@ -1,4 +1,4 @@
-#include "findonsoundcloudmenu.h"
+#include "findonwebmenusoundcloud.h"
 
 #include <QMenu>
 
@@ -15,14 +15,14 @@ const QString kSearchUrlTitle = QStringLiteral("https://soundcloud.com/search/so
 const QString kSearchUrlAlbum = QStringLiteral("https://soundcloud.com/search/albums?");
 } // namespace
 
-FindOnSoundcloudMenu::FindOnSoundcloudMenu(
-        QMenu* pFindOnMenu, const Track& track) {
+FindOnWebMenuSoundcloud::FindOnWebMenuSoundcloud(
+        QMenu* pFindOnWebMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pSoundcloudMenu = make_parented<QMenu>(pFindOnMenu);
+    auto pSoundcloudMenu = make_parented<QMenu>(pFindOnWebMenu);
     pSoundcloudMenu->setTitle(kServiceTitle);
-    pFindOnMenu->addMenu(pSoundcloudMenu);
+    pFindOnWebMenu->addMenu(pSoundcloudMenu);
     pSoundcloudMenu->addSeparator();
     if (!artist.isEmpty()) {
         pSoundcloudMenu->addAction(composeActionText(tr("Artist"), artist),

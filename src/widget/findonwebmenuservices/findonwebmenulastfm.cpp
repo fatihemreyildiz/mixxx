@@ -1,4 +1,4 @@
-#include "findonlastfmmenu.h"
+#include "findonwebmenulastfm.h"
 
 #include <QMenu>
 
@@ -15,13 +15,13 @@ const QString kSearchUrlTitle = QStringLiteral("https://www.last.fm/search/track
 const QString kSearchUrlAlbum = QStringLiteral("https://www.last.fm/search/albums?");
 } //namespace
 
-FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
+FindOnWebMenuLastfm::FindOnWebMenuLastfm(QMenu* pFindOnWebMenu, const Track& track) {
     const QString artist = track.getArtist();
     const QString trackTitle = track.getTitle();
     const QString album = track.getAlbum();
-    auto pLastfmMenu = make_parented<QMenu>(pFindOnMenu);
+    auto pLastfmMenu = make_parented<QMenu>(pFindOnWebMenu);
     pLastfmMenu->setTitle(kServiceTitle);
-    pFindOnMenu->addMenu(pLastfmMenu);
+    pFindOnWebMenu->addMenu(pLastfmMenu);
     pLastfmMenu->addSeparator();
     if (!artist.isEmpty()) {
         pLastfmMenu->addAction(composeActionText(tr("Artist"), artist),
