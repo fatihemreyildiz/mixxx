@@ -27,7 +27,7 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
         pLastfmMenu->addAction(composeActionText(tr("Artist"), artist),
                 this,
                 [this, artist] {
-                    this->openInBrowser(artist, kSearchUrlArtist);
+                    openInBrowser(artist, kSearchUrlArtist);
                 });
     }
     if (!trackTitle.isEmpty()) {
@@ -36,13 +36,13 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
             pLastfmMenu->addAction(composeActionText(tr("Artist + Title"), artistWithTrackTitle),
                     this,
                     [this, artistWithTrackTitle] {
-                        this->openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
+                        openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
                     });
         }
         pLastfmMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
-                    this->openInBrowser(trackTitle, kSearchUrlTitle);
+                    openInBrowser(trackTitle, kSearchUrlTitle);
                 });
     }
     if (!album.isEmpty()) {
@@ -51,13 +51,13 @@ FindOnLastfmMenu::FindOnLastfmMenu(QMenu* pFindOnMenu, const Track& track) {
             pLastfmMenu->addAction(composeActionText(tr("Artist + Album"), artistWithAlbum),
                     this,
                     [this, artistWithAlbum] {
-                        this->openInBrowser(artistWithAlbum, kSearchUrlAlbum);
+                        openInBrowser(artistWithAlbum, kSearchUrlAlbum);
                     });
         } else {
             pLastfmMenu->addAction(composeActionText(tr("Album"), album),
                     this,
                     [this, album] {
-                        this->openInBrowser(album, kSearchUrlAlbum);
+                        openInBrowser(album, kSearchUrlAlbum);
                     });
         }
     }

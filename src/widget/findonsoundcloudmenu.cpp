@@ -28,7 +28,7 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
         pSoundcloudMenu->addAction(composeActionText(tr("Artist"), artist),
                 this,
                 [this, artist] {
-                    this->openInBrowser(artist, kSearchUrlArtist);
+                    openInBrowser(artist, kSearchUrlArtist);
                 });
     }
     if (!trackTitle.isEmpty()) {
@@ -38,13 +38,13 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
                                                artistWithTrackTitle),
                     this,
                     [this, artistWithTrackTitle] {
-                        this->openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
+                        openInBrowser(artistWithTrackTitle, kSearchUrlTitle);
                     });
         }
         pSoundcloudMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
-                    this->openInBrowser(trackTitle, kSearchUrlTitle);
+                    openInBrowser(trackTitle, kSearchUrlTitle);
                 });
     }
     if (!album.isEmpty()) {
@@ -53,13 +53,13 @@ FindOnSoundcloudMenu::FindOnSoundcloudMenu(
             pSoundcloudMenu->addAction(composeActionText(tr("Artist + Album"), artistWithAlbum),
                     this,
                     [this, artistWithAlbum] {
-                        this->openInBrowser(artistWithAlbum, kSearchUrlAlbum);
+                        openInBrowser(artistWithAlbum, kSearchUrlAlbum);
                     });
         } else {
             pSoundcloudMenu->addAction(composeActionText(tr("Album"), album),
                     this,
                     [this, album] {
-                        this->openInBrowser(album, kSearchUrlAlbum);
+                        openInBrowser(album, kSearchUrlAlbum);
                     });
         }
     }

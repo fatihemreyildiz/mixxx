@@ -28,7 +28,7 @@ FindOnDiscogsMenu::FindOnDiscogsMenu(QMenu* pFindOnMenu, const Track& track) {
         pDiscogsMenu->addAction(composeActionText(tr("Artist"), artist),
                 this,
                 [this, artist] {
-                    this->openInBrowser(artist, kQueryTypeArtist, kSearchUrl);
+                    openInBrowser(artist, kQueryTypeArtist, kSearchUrl);
                 });
     }
     if (!trackTitle.isEmpty()) {
@@ -37,13 +37,13 @@ FindOnDiscogsMenu::FindOnDiscogsMenu(QMenu* pFindOnMenu, const Track& track) {
             pDiscogsMenu->addAction(composeActionText(tr("Artist + Title"), artistWithTrackTitle),
                     this,
                     [this, artistWithTrackTitle] {
-                        this->openInBrowser(artistWithTrackTitle, kQueryTypeRelease, kSearchUrl);
+                        openInBrowser(artistWithTrackTitle, kQueryTypeRelease, kSearchUrl);
                     });
         }
         pDiscogsMenu->addAction(composeActionText(tr("Title"), trackTitle),
                 this,
                 [this, trackTitle] {
-                    this->openInBrowser(trackTitle, kQueryTypeRelease, kSearchUrl);
+                    openInBrowser(trackTitle, kQueryTypeRelease, kSearchUrl);
                 });
     }
     if (!album.isEmpty()) {
@@ -52,13 +52,13 @@ FindOnDiscogsMenu::FindOnDiscogsMenu(QMenu* pFindOnMenu, const Track& track) {
             pDiscogsMenu->addAction(composeActionText(tr("Artist + Album"), artistWithAlbum),
                     this,
                     [this, artistWithAlbum] {
-                        this->openInBrowser(artistWithAlbum, kSearchUrl);
+                        openInBrowser(artistWithAlbum, kSearchUrl);
                     });
         } else {
             pDiscogsMenu->addAction(composeActionText(tr("Album"), album),
                     this,
                     [this, album] {
-                        this->openInBrowser(album, kSearchUrl);
+                        openInBrowser(album, kSearchUrl);
                     });
         }
     }
