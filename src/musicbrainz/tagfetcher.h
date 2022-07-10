@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "musicbrainz/web/acoustidlookuptask.h"
+#include "musicbrainz/web/coverartarchivetask.h"
 #include "musicbrainz/web/musicbrainzrecordingstask.h"
 #include "track/track_decl.h"
 #include "util/parented_ptr.h"
@@ -23,6 +24,8 @@ class TagFetcher : public QObject {
 
     void startFetch(
             TrackPointer pTrack);
+
+    void coverArtSend(const QString& albumReleaseId);
 
   public slots:
     void cancel();
@@ -64,9 +67,19 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
 
+    void slotCoverArtArchiveTaskSucceeded();
+    void slotCoverArtArchiveTaskFailed(
+            const mixxx::network::JsonWebResponse& response);
+    void slotCoverArtArchiveTaskAborted();
+    void slotCoverArtArchiveTaskNetworkError(
+            QNetworkReply::NetworkError errorCode,
+            const QString& errorString,
+            const mixxx::network::WebResponseWithContent& responseWithContent);
+
   private:
     bool onAcoustIdTaskTerminated();
     bool onMusicBrainzTaskTerminated();
+    bool onCoverArtArchiveTaskTerminated();
 
     QNetworkAccessManager m_network;
 
@@ -75,6 +88,8 @@ class TagFetcher : public QObject {
     parented_ptr<mixxx::AcoustIdLookupTask> m_pAcoustIdTask;
 
     parented_ptr<mixxx::MusicBrainzRecordingsTask> m_pMusicBrainzTask;
+
+    parented_ptr<mixxx::CoverArtArchiveTask> m_pCoverArtArchiveTask;
 
     TrackPointer m_pTrack;
 };

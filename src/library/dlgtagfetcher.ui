@@ -180,6 +180,9 @@
        </item>
       </layout>
      </widget>
+
+
+
      <widget class="QWidget" name="loading_page">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -657,6 +660,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnCover">
+       <property name="text">
+        <string>&amp;Cover</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -696,6 +706,7 @@
   <tabstop>btnCover</tabstop>
   <tabstop>btnPrev</tabstop>
   <tabstop>btnNext</tabstop>
+  <tabstop>btnCover</tabstop>
   <tabstop>btnApply</tabstop>
   <tabstop>btnQuit</tabstop>
  </tabstops>

@@ -47,6 +47,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void slotTrackChanged(TrackId trackId);
     void apply();
     void quit();
+    void fetchCoverArt();
     void slotNext();
     void slotPrev();
     void slotCoverFound(
@@ -63,6 +64,13 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void addDivider(const QString& text, QTreeWidget* parent) const;
 
     const TrackModel* const m_pTrackModel;
+
+    void slotCoverFound(
+            const QObject* pRequestor,
+            const CoverInfo& coverInfo,
+            const QPixmap& pixmap,
+            mixxx::cache_key_t requestedCacheKey,
+            bool coverInfoUpdated);
 
     TagFetcher m_tagFetcher;
 

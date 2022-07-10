@@ -16,6 +16,9 @@ constexpr int kAcoustIdTimeoutMillis = 60000; // msec
 // Long timeout to cope with occasional server-side unresponsiveness
 constexpr int kMusicBrainzTimeoutMillis = 60000; // msec
 
+// Long timeout to cope with occasional server-side unresponsiveness
+constexpr int kCoverArtArchiveTimeoutMilis = 60000; // msec
+
 } // anonymous namespace
 
 TagFetcher::TagFetcher(QObject* parent)
@@ -149,6 +152,33 @@ void TagFetcher::slotAcoustIdTaskSucceeded(
             kMusicBrainzTimeoutMillis);
 }
 
+void TagFetcher::coverArtSend(const QString& albumReleaseId) {
+    m_pCoverArtArchiveTask = make_parented<mixxx::CoverArtArchiveTask>(
+            &m_network,
+            albumReleaseId,
+            this);
+
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::succeeded,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskSucceeded);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::failed,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskFailed);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::aborted,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskAborted);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::networkError,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskNetworkError);
+
+    m_pCoverArtArchiveTask->invokeStart(
+            kCoverArtArchiveTimeoutMilis);
+}
+
 bool TagFetcher::onAcoustIdTaskTerminated() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     auto* const pAcoustIdTask = m_pAcoustIdTask.get();
@@ -280,4 +310,72 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
     emit resultAvailable(
             std::move(pTrack),
             std::move(guessedTrackReleases));
+}
+
+bool TagFetcher::onCoverArtArchiveTaskTerminated() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    auto* const pCoverArtArchiveTask = m_pCoverArtArchiveTask.get();
+    DEBUG_ASSERT(sender());
+    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveTask ==
+            qobject_cast<mixxx::CoverArtArchiveTask*>(sender())) {
+        return false;
+    }
+    m_pCoverArtArchiveTask = nullptr;
+    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveTask);
+    pCoverArtArchiveTask->disconnect(this);
+    return true;
+}
+
+void TagFetcher::slotCoverArtArchiveTaskAborted() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveTaskTerminated()) {
+        return;
+    }
+
+    cancel();
+}
+
+void TagFetcher::slotCoverArtArchiveTaskNetworkError(
+        QNetworkReply::NetworkError errorCode,
+        const QString& errorString,
+        const mixxx::network::WebResponseWithContent& responseWithContent) {
+    Q_UNUSED(responseWithContent);
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveTaskTerminated()) {
+        return;
+    }
+
+    cancel();
+
+    emit networkError(
+            mixxx::network::kHttpStatusCodeInvalid,
+            QStringLiteral("CoverArtArchiveeee"),
+            errorString,
+            errorCode);
+}
+
+void TagFetcher::slotCoverArtArchiveTaskFailed( //Handle the issue better.
+        const mixxx::network::JsonWebResponse& response) {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveTaskTerminated()) {
+        return;
+    }
+
+    cancel();
+
+    emit networkError(
+            response.statusCode(),
+            "CoverArtArchive",
+            response.content().toJson(),
+            -1); //-1
+}
+
+void TagFetcher::slotCoverArtArchiveTaskSucceeded() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveTaskTerminated()) {
+        return;
+    }
+
+    auto pTrack = std::move(m_pTrack);
+    cancel();
 }

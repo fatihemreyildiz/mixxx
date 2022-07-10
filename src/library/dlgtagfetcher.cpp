@@ -92,6 +92,11 @@ void DlgTagFetcher::init() {
         btnNext->hide();
         btnPrev->hide();
     }
+    connect(btnCover,
+            &QPushButton::clicked,
+            this,
+            &DlgTagFetcher::
+                    fetchCoverArt); // This button sends GET request
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);
@@ -253,6 +258,18 @@ void DlgTagFetcher::loadCurrentTrackCover() {
     m_pCurrentCoverArt->loadTrack(m_track);
     CoverArtCache* pCache = CoverArtCache::instance();
     pCache->requestTrackCover(this, m_track);
+}
+
+void DlgTagFetcher::fetchCoverArt() {
+    int resultIndex = m_data.m_selectedResult;
+
+    if (resultIndex < 0) {
+        return;
+    }
+    const mixxx::musicbrainz::TrackRelease& trackRelease =
+            m_data.m_results[resultIndex];
+    const QString coverArtArchiveMbid = trackRelease.albumReleaseId.toString(QUuid::WithoutBraces);
+    m_tagFetcher.coverArtSend(coverArtArchiveMbid);
 }
 
 void DlgTagFetcher::fetchTagProgress(const QString& text) {
