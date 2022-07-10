@@ -107,18 +107,18 @@ void CoverArtArchiveTask::doNetworkReplyFinished(
 
         return;
     }
+}
 
-    void CoverArtArchiveTask::emitSucceeded( //Dummy function, will be developed later.
-            const QList<QUuid>& coverArtPaths) {
-        VERIFY_OR_DEBUG_ASSERT(
-                isSignalFuncConnected(&CoverArtArchiveTask::succeeded)) {
-            kLogger.warning()
-                    << "Unhandled succeeded signal";
-            deleteLater();
-            return;
-        }
-        emit succeeded(coverArtPaths);
+void CoverArtArchiveTask::emitSucceeded( //Dummy function, will be developed later.
+        const QList<QUuid>& coverArtPaths) {
+    VERIFY_OR_DEBUG_ASSERT(
+            isSignalFuncConnected(&CoverArtArchiveTask::succeeded)) {
+        kLogger.warning()
+                << "Unhandled succeeded signal";
+        deleteLater();
+        return;
     }
+    emit succeeded(coverArtPaths);
 }
 
 } // namespace mixxx
