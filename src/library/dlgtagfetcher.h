@@ -8,6 +8,11 @@
 #include "library/ui_dlgtagfetcher.h"
 #include "musicbrainz/tagfetcher.h"
 #include "track/track_decl.h"
+#include "track/trackrecord.h"
+#include "util/parented_ptr.h"
+#include "widget/wcoverartlabel.h"
+
+class WCoverArtLabel;
 
 /// A dialog box to fetch track metadata from MusicBrainz.
 /// Use TrackPointer to load a track into the dialog or
@@ -44,8 +49,15 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void quit();
     void slotNext();
     void slotPrev();
+    void slotCoverFound(
+            const QObject* pRequestor,
+            const CoverInfo& coverInfo,
+            const QPixmap& pixmap,
+            mixxx::cache_key_t requestedCacheKey,
+            bool coverInfoUpdated);
 
   private:
+    void loadCurrentTrackCover();
     void loadTrackInternal(const TrackPointer& track);
     void updateStack();
     void addDivider(const QString& text, QTreeWidget* parent) const;
@@ -57,6 +69,10 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     TrackPointer m_track;
 
     QModelIndex m_currentTrackIndex;
+
+    parented_ptr<WCoverArtLabel> m_pWCoverArtLabel;
+
+    mixxx::TrackRecord m_trackRecord;
 
     struct Data {
         Data()
