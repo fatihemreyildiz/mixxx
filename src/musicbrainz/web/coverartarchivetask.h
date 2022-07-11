@@ -2,7 +2,6 @@
 
 #include <QList>
 #include <QString>
-#include <QUuid>
 
 #include "network/jsonwebtask.h"
 
@@ -21,7 +20,7 @@ class CoverArtArchiveTask : public network::JsonWebTask {
 
   signals:
     void succeeded(
-            const QList<QUuid>& coverArtPaths);
+            const QList<QString>& coverArtPaths);
 
     void failed(
             const mixxx::network::JsonWebResponse& response);
@@ -32,12 +31,12 @@ class CoverArtArchiveTask : public network::JsonWebTask {
             network::HttpRequestMethod method,
             const QUrl& url,
             const QJsonDocument& content) override;
-    void doNetworkReplyFinished(
-            QNetworkReply* finishedNetworkReply,
-            network::HttpStatusCode statusCode) override;
+
+    void onFinished(
+            const network::JsonWebResponse& response) override;
 
     void emitSucceeded(
-            const QList<QUuid>& recordingIds);
+            const QList<QString>& recordingIds);
 
     const QString m_AlbumReleaseId;
 };

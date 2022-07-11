@@ -1,11 +1,10 @@
 #include "musicbrainz/web/coverartarchivetask.h"
 
-#include <QByteArray>
+#include <QJsonArray>
 #include <QJsonDocument>
-#include <QMetaMethod>
+#include <QJsonObject>
 #include <QNetworkRequest>
 
-#include "musicbrainz/musicbrainzxml.h"
 #include "network/httpstatuscode.h"
 #include "util/assert.h"
 #include "util/logger.h"
@@ -76,41 +75,78 @@ QNetworkReply* CoverArtArchiveTask::sendNetworkRequest(
     return networkAccessManager->get(networkRequest);
 }
 
-void CoverArtArchiveTask::doNetworkReplyFinished(
-        QNetworkReply* finishedNetworkReply,
-        network::HttpStatusCode statusCode) {
-    DEBUG_ASSERT(finishedNetworkReply);
-    kLogger.info() << "Networkreply finished. So We got:";
-    kLogger.info() << statusCode;
-    const QByteArray body = finishedNetworkReply->readAll();
-    QJsonDocument theCoverArtResult = QJsonDocument::fromJson(body);
-
-    // HTTP status codes:
-    // 307: Found, redirect to an index.json file.
-    // 400: MBID cannot be parsed as a valid UUID.
-    // 404: there is no release with this MBID.
-    // 405: The method is not one GET or HEAD.
-    // 406: the server is unable to generate a response suitable to the Accept header.
-    // 503: Rate limit error.
-
-    if (statusCode == 200) {
-        kLogger.info() << "GET Reply";
-        kLogger.info() << "statuscode:" << statusCode;
-        kLogger.info() << theCoverArtResult;
-    }
-
-    if (statusCode == 404) {
-        kLogger.info()
-                << "GET reply"
-                << "statusCode:" << statusCode
-                << "body:" << body;
-
+void CoverArtArchiveTask::onFinished(
+        const network::JsonWebResponse& response) {
+    if (!response.isStatusCodeSuccess()) {
+        kLogger.warning()
+                << "Request failed with HTTP status code"
+                << response.statusCode();
+        emitFailed(response);
         return;
     }
+    VERIFY_OR_DEBUG_ASSERT(response.statusCode() == network::kHttpStatusCodeOk) {
+        kLogger.warning()
+                << "Unexpected HTTP status code"
+                << response.statusCode();
+        emitFailed(response);
+        return;
+    }
+    VERIFY_OR_DEBUG_ASSERT(response.content().isObject()) {
+        kLogger.warning()
+                << "Invalid JSON content"
+                << response.content();
+        emitFailed(response);
+        return;
+    }
+    const auto jsonObject = response.content().object();
+
+    if (jsonObject.isEmpty()) {
+        kLogger.warning()
+                << "Empty Json";
+        emitFailed(response);
+        return;
+    }
+
+    QList<QString> coverArtPaths;
+    DEBUG_ASSERT(jsonObject.value(QLatin1String("images")).isArray());
+    const QJsonArray images = jsonObject.value(QLatin1String("images")).toArray();
+    for (const auto& image : images) {
+        DEBUG_ASSERT(image.isObject());
+        const auto imageObject = image.toObject();
+        const auto imageLink =
+                imageObject.value(QLatin1String("image")).toString();
+
+        qDebug() << "Original image";
+        qDebug() << imageLink; // Just to see image link.
+
+        const auto thumbnails =
+                imageObject.value(QLatin1String("thumbnails")).toObject();
+
+        for (const auto& thumbnail : thumbnails) {
+            qDebug() << "One of the thumbnail of the cover art";
+            qDebug() << thumbnail.toString(); // Just to see the thumbnails.
+
+            if (thumbnail.isUndefined()) {
+                if (kLogger.debugEnabled()) {
+                    kLogger.debug()
+                            << "No thumbnail(s) available for image"
+                            << imageLink;
+                }
+                continue;
+            } else {
+                const auto thumbnailLink =
+                        QString(thumbnail.toString());
+                coverArtPaths.append(thumbnailLink);
+            }
+        }
+    }
+    qDebug() << "List of cover art paths, thumbnails.";
+    qDebug() << coverArtPaths; // Just to see all the thumbnails.
+    emitSucceeded(coverArtPaths);
 }
 
 void CoverArtArchiveTask::emitSucceeded( //Dummy function, will be developed later.
-        const QList<QUuid>& coverArtPaths) {
+        const QList<QString>& coverArtPaths) {
     VERIFY_OR_DEBUG_ASSERT(
             isSignalFuncConnected(&CoverArtArchiveTask::succeeded)) {
         kLogger.warning()

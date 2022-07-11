@@ -349,7 +349,7 @@ void TagFetcher::slotCoverArtArchiveTaskNetworkError(
 
     emit networkError(
             mixxx::network::kHttpStatusCodeInvalid,
-            QStringLiteral("CoverArtArchiveeee"),
+            QStringLiteral("CoverArtArchive"),
             errorString,
             errorCode);
 }
@@ -367,7 +367,7 @@ void TagFetcher::slotCoverArtArchiveTaskFailed( //Handle the issue better.
             response.statusCode(),
             "CoverArtArchive",
             response.content().toJson(),
-            -1); //-1
+            -1);
 }
 
 void TagFetcher::slotCoverArtArchiveTaskSucceeded() {
