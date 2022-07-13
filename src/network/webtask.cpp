@@ -135,6 +135,16 @@ void WebTask::onNetworkError(
         // Network or server-side timeout
         m_state = State::TimedOut;
         break;
+    // Find another solution! (fatihemreyildiz)
+    // This is a poor man solution for coverartarchivetask.
+    // In normal cases, AcoustID and MusicBrainz doesn't trigger emitNetworkError
+    // Even though they don't find anything with the request.
+    // They only trigger if there is no Internet connection
+    // Coverartarchive is returning 404-Not Found if the MBID doesn't have related cover art.
+    case QNetworkReply::ContentNotFoundError:
+        m_state = State::Aborted;
+        qDebug() << "State::ContentNotFoundError";
+        break;
     default:
         m_state = State::Failed;
     }
