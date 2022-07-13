@@ -31,7 +31,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" rowspan="4">
         <widget class="QTreeWidget" name="results">
          <property name="editTriggers">
           <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
@@ -80,15 +80,25 @@
          </column>
         </widget>
        </item>
+      <item row="0" column="1">
+        <widget class="QLabel" name="label_4">
+         <property name="styleSheet">
+          <string notr="true">QLabel { font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>Current Cover Art</string>
+         </property>
+        </widget>
+      </item>
       <item row="1" column="1">
              <widget class="QWidget" name="verticalWidgetCover" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>240</horstretch>
-                <verstretch>240</verstretch>
+                <horstretch>250</horstretch>
+                <verstretch>250</verstretch>
                </sizepolicy>
               </property>
-              <layout class="QVBoxLayout" name="coverFetcherLayout">
+              <layout class="QVBoxLayout" name="currentCoverArtLayout">
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -98,6 +108,41 @@
               </layout>
              </widget>
         </item>
+      <item row="2" column="1">
+        <widget class="QLabel" name="label_5">
+         <property name="styleSheet">
+          <string notr="true">QLabel { font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>Found Cover Art</string>
+         </property>
+        </widget>
+      </item>
+      <item row="3" column="1">
+             <widget class="QWidget" name="verticalWidgetCover_2" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>250</horstretch>
+                <verstretch>250</verstretch>
+               </sizepolicy>
+              </property>
+              <layout class="QVBoxLayout" name="fetchedCoverArtLayout">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="sizeConstraint">
+                <enum>QLayout::SetDefaultConstraint</enum>
+               </property>
+              </layout>
+             </widget>
+        </item>
+      <item row="4" column="1">
+      <widget class="QPushButton" name="btnCover">
+       <property name="text">
+        <string>&amp;Set Cover Art</string>
+       </property>
+      </widget>
+     </item>
       </layout>
      </widget>
      <widget class="QWidget" name="loading_page">
@@ -613,6 +658,7 @@
   <tabstop>btnApikey</tabstop>
   <tabstop>btnSubmit</tabstop>
   <tabstop>submit_tree</tabstop>
+  <tabstop>btnCover</tabstop>
   <tabstop>btnPrev</tabstop>
   <tabstop>btnNext</tabstop>
   <tabstop>btnApply</tabstop>

@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <QWidget>
 
+#include "library/coverartlabel.h"
 #include "track/track_decl.h"
 #include "util/parented_ptr.h"
 
@@ -13,7 +14,7 @@ class DlgCoverArtFullSize;
 class CoverInfo;
 class CoverInfoRelative;
 
-class WCoverArtLabel : public QLabel {
+class WCoverArtLabel : public CoverArtLabel {
     Q_OBJECT
   public:
     explicit WCoverArtLabel(QWidget* parent = nullptr, WCoverArtMenu* m_pWCoverArtMenu = nullptr);
@@ -24,7 +25,6 @@ class WCoverArtLabel : public QLabel {
     void loadTrack(TrackPointer pTrack);
 
   protected:
-    void mousePressEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
 
   private slots:
