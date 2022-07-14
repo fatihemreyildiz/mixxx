@@ -37,13 +37,12 @@ std::optional<QJsonDocument> readJsonContent(
     DEBUG_ASSERT(reply);
     DEBUG_ASSERT(JSON_MIME_TYPE.isValid());
     auto contentType = WebTask::readContentType(*reply);
-    auto optContentData = WebTask::readContentData(reply);
-    if (contentType != JSON_MIME_TYPE) {
-        kLogger.debug()
-                << "Received content type"
-                << contentType
-                << "instead of"
-                << JSON_MIME_TYPE;
+    auto optContentData = WebTask::readContentData(reply); //This comment will be deleted later.
+    if (contentType !=
+            JSON_MIME_TYPE) {              //This was the reason why image couldn't get fetched
+        kLogger.debug() // This Task was expecting Json and it received "image/jpeg"
+                << "Received content type" //In order to not fail from this, we needed "coverartarchiveimagetask.cpp""
+                << contentType << "instead of" << JSON_MIME_TYPE;
         if (pInvalidResponseContent) {
             *pInvalidResponseContent = std::make_pair(
                     std::move(contentType),

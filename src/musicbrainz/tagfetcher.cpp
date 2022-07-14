@@ -179,6 +179,17 @@ void TagFetcher::coverArtSend(const QString& albumReleaseId) {
             kCoverArtArchiveTimeoutMilis);
 }
 
+void TagFetcher::coverArtSendImageRequest() {
+    qDebug() << "TagFetcher::coverArtSendImageRequest()";
+    m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
+            &m_network,
+            QString(),
+            this);
+
+    m_pCoverArtArchiveImageTask->invokeStart(
+            kCoverArtArchiveTimeoutMilis);
+}
+
 bool TagFetcher::onAcoustIdTaskTerminated() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     auto* const pAcoustIdTask = m_pAcoustIdTask.get();

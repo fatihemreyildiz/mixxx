@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "musicbrainz/web/acoustidlookuptask.h"
+#include "musicbrainz/web/coverartarchiveimagetask.h"
 #include "musicbrainz/web/coverartarchivetask.h"
 #include "musicbrainz/web/musicbrainzrecordingstask.h"
 #include "track/track_decl.h"
@@ -26,6 +27,7 @@ class TagFetcher : public QObject {
             TrackPointer pTrack);
 
     void coverArtSend(const QString& albumReleaseId);
+    void coverArtSendImageRequest();
 
   public slots:
     void cancel();
@@ -90,6 +92,8 @@ class TagFetcher : public QObject {
     parented_ptr<mixxx::MusicBrainzRecordingsTask> m_pMusicBrainzTask;
 
     parented_ptr<mixxx::CoverArtArchiveTask> m_pCoverArtArchiveTask;
+
+    parented_ptr<mixxx::CoverArtArchiveImageTask> m_pCoverArtArchiveImageTask;
 
     TrackPointer m_pTrack;
 };

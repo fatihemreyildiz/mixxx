@@ -97,6 +97,11 @@ void DlgTagFetcher::init() {
             this,
             &DlgTagFetcher::
                     fetchCoverArt); // This button sends GET request
+    connect(btnImage,
+            &QPushButton::clicked,
+            this, // This button is just a try-out for to send request and get response
+            &DlgTagFetcher:: // as image. For now Image url is hard-coded.
+            fetchCoverArtImage); // Later on it can get it from the response of coverartarchive.
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);
@@ -270,6 +275,15 @@ void DlgTagFetcher::fetchCoverArt() {
             m_data.m_results[resultIndex];
     const QString coverArtArchiveMbid = trackRelease.albumReleaseId.toString(QUuid::WithoutBraces);
     m_tagFetcher.coverArtSend(coverArtArchiveMbid);
+}
+
+void DlgTagFetcher::fetchCoverArtImage() {
+    int resultIndex = m_data.m_selectedResult;
+
+    if (resultIndex < 0) {
+        return;
+    }
+    m_tagFetcher.coverArtSendImageRequest();
 }
 
 void DlgTagFetcher::fetchTagProgress(const QString& text) {
