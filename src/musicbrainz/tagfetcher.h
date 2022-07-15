@@ -77,6 +77,7 @@ class TagFetcher : public QObject {
             QNetworkReply::NetworkError errorCode,
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
+    void slotCoverArtArchiveTaskNotFound();
 
   private:
     bool onAcoustIdTaskTerminated();

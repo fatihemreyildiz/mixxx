@@ -142,8 +142,7 @@ void WebTask::onNetworkError(
     // They only trigger if there is no Internet connection
     // Coverartarchive is returning 404-Not Found if the MBID doesn't have related cover art.
     case QNetworkReply::ContentNotFoundError:
-        m_state = State::Aborted;
-        qDebug() << "State::ContentNotFoundError";
+        m_state = State::NotFound;
         break;
     default:
         m_state = State::Failed;
@@ -152,6 +151,8 @@ void WebTask::onNetworkError(
 
     if (m_state == State::Aborted) {
         emitAborted(responseWithContent.requestUrl());
+    } else if (m_state == State::NotFound) {
+        emitNotFound(errorCode, errorString, responseWithContent.requestUrl());
     } else {
         emitNetworkError(
                 errorCode,

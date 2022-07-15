@@ -171,6 +171,10 @@ void TagFetcher::coverArtSend(const QString& albumReleaseId) {
             this,
             &TagFetcher::slotCoverArtArchiveTaskAborted);
     connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::notFound,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskNotFound);
+    connect(m_pCoverArtArchiveTask,
             &mixxx::CoverArtArchiveTask::networkError,
             this,
             &TagFetcher::slotCoverArtArchiveTaskNetworkError);
@@ -346,6 +350,15 @@ void TagFetcher::slotCoverArtArchiveTaskAborted() {
     cancel();
 }
 
+void TagFetcher::slotCoverArtArchiveTaskNotFound() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveTaskTerminated()) {
+        return;
+    }
+    qDebug() << "No image found on Cover Art Archive";
+    cancel();
+}
+
 void TagFetcher::slotCoverArtArchiveTaskNetworkError(
         QNetworkReply::NetworkError errorCode,
         const QString& errorString,
@@ -365,7 +378,7 @@ void TagFetcher::slotCoverArtArchiveTaskNetworkError(
             errorCode);
 }
 
-void TagFetcher::slotCoverArtArchiveTaskFailed( //Handle the issue better.
+void TagFetcher::slotCoverArtArchiveTaskFailed(
         const mixxx::network::JsonWebResponse& response) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     if (!onCoverArtArchiveTaskTerminated()) {

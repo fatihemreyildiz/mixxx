@@ -99,9 +99,9 @@ void DlgTagFetcher::init() {
                     fetchCoverArt); // This button sends GET request
     connect(btnImage,
             &QPushButton::clicked,
-            this, // This button is just a try-out for to send request and get response
-            &DlgTagFetcher:: // as image. For now Image url is hard-coded.
-            fetchCoverArtImage); // Later on it can get it from the response of coverartarchive.
+            this,
+            &DlgTagFetcher::
+                    fetchCoverArtImage);
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);

@@ -153,6 +153,7 @@ class WebTask : public NetworkTask {
         // Terminal states
         Aborted,
         TimedOut,
+        NotFound,
         Failed,
         Finished,
     };
@@ -164,6 +165,7 @@ class WebTask : public NetworkTask {
     bool hasTerminated() const {
         return state() == State::Aborted ||
                 state() == State::TimedOut ||
+                state() == State::NotFound ||
                 state() == State::Failed ||
                 state() == State::Finished;
     }
