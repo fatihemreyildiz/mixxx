@@ -96,8 +96,7 @@ void DlgTagFetcher::init() {
             &QPushButton::clicked,
             this,
             &DlgTagFetcher::
-                    fetchCoverArt); // This button sends GET request
-
+                    fetchCoverArt);
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);
@@ -105,6 +104,11 @@ void DlgTagFetcher::init() {
     connect(&m_tagFetcher, &TagFetcher::resultAvailable, this, &DlgTagFetcher::fetchTagFinished);
     connect(&m_tagFetcher, &TagFetcher::fetchProgress, this, &DlgTagFetcher::fetchTagProgress);
     connect(&m_tagFetcher, &TagFetcher::networkError, this, &DlgTagFetcher::slotNetworkResult);
+
+    connect(&m_tagFetcher,
+            &TagFetcher::fetchedCoverUpdate,
+            this,
+            &DlgTagFetcher::slotCoverFoundWeb);
 
     CoverArtCache* pCache = CoverArtCache::instance();
     if (pCache) {
@@ -273,15 +277,6 @@ void DlgTagFetcher::fetchCoverArt() {
     m_tagFetcher.coverArtSend(coverArtArchiveMbid);
 }
 
-void DlgTagFetcher::fetchCoverArtImage() {
-    int resultIndex = m_data.m_selectedResult;
-
-    if (resultIndex < 0) {
-        return;
-    }
-    m_tagFetcher.coverArtSendImageRequest();
-}
-
 void DlgTagFetcher::fetchTagProgress(const QString& text) {
     QString status = tr("Status: %1");
     loadingStatus->setText(status.arg(text));
@@ -407,4 +402,15 @@ void DlgTagFetcher::slotCoverFound(
         m_trackRecord.setCoverInfo(coverInfo);
         m_pCurrentCoverArt->setCoverArt(coverInfo, pixmap);
     }
+}
+
+void DlgTagFetcher::slotCoverFoundWeb(const QByteArray& data) {
+    QPixmap image;
+    image.loadFromData(data);
+    CoverInfo coverInfo;
+    coverInfo.type = CoverInfo::NONE;
+    coverInfo.source = CoverInfo::USER_SELECTED;
+    coverInfo.setImage();
+    m_pFetchedCoverArt->loadData(data); //This data loaded because for full size.
+    m_pFetchedCoverArt->setCoverArt(coverInfo, image);
 }

@@ -27,7 +27,7 @@ class TagFetcher : public QObject {
             TrackPointer pTrack);
 
     void coverArtSend(const QString& albumReleaseId);
-    void coverArtSendImageRequest();
+    void coverArtSendImage(const QUrl& coverUrl);
 
   public slots:
     void cancel();
@@ -43,6 +43,7 @@ class TagFetcher : public QObject {
             const QString& app,
             const QString& message,
             int code);
+    void fetchedCoverUpdate(const QByteArray& coverInfo);
 
   private slots:
     void slotFingerprintReady();
@@ -69,7 +70,7 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
 
-    void slotCoverArtArchiveTaskSucceeded();
+    void slotCoverArtArchiveTaskSucceeded(const QList<QString>& coverArtPaths);
     void slotCoverArtArchiveTaskFailed(
             const mixxx::network::JsonWebResponse& response);
     void slotCoverArtArchiveTaskAborted();
@@ -78,6 +79,8 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
     void slotCoverArtArchiveTaskNotFound();
+
+    void slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverInfo);
 
   private:
     bool onAcoustIdTaskTerminated();

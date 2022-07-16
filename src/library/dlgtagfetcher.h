@@ -48,7 +48,6 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void apply();
     void quit();
     void fetchCoverArt();
-    void fetchCoverArtImage();
     void slotNext();
     void slotPrev();
     void slotCoverFound(
@@ -57,6 +56,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
             const QPixmap& pixmap,
             mixxx::cache_key_t requestedCacheKey,
             bool coverInfoUpdated);
+    void slotCoverFoundWeb(const QByteArray& data);
 
   private:
     void loadCurrentTrackCover();

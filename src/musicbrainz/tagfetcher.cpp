@@ -19,6 +19,9 @@ constexpr int kMusicBrainzTimeoutMillis = 60000; // msec
 // Long timeout to cope with occasional server-side unresponsiveness
 constexpr int kCoverArtArchiveTimeoutMilis = 60000; // msec
 
+// Long timeout to cope with occasional server-side unresponsiveness
+constexpr int kCoverArtArchiveImageTimeoutMilis = 60000; // msec
+
 } // anonymous namespace
 
 TagFetcher::TagFetcher(QObject* parent)
@@ -183,15 +186,19 @@ void TagFetcher::coverArtSend(const QString& albumReleaseId) {
             kCoverArtArchiveTimeoutMilis);
 }
 
-void TagFetcher::coverArtSendImageRequest() {
-    qDebug() << "TagFetcher::coverArtSendImageRequest()";
+void TagFetcher::coverArtSendImage(const QUrl& coverUrl) {
     m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
             &m_network,
-            QString(),
+            coverUrl,
             this);
 
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::succeeded,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskSucceeded);
+
     m_pCoverArtArchiveImageTask->invokeStart(
-            kCoverArtArchiveTimeoutMilis);
+            kCoverArtArchiveImageTimeoutMilis);
 }
 
 bool TagFetcher::onAcoustIdTaskTerminated() {
@@ -394,12 +401,28 @@ void TagFetcher::slotCoverArtArchiveTaskFailed(
             -1);
 }
 
-void TagFetcher::slotCoverArtArchiveTaskSucceeded() {
+void TagFetcher::slotCoverArtArchiveTaskSucceeded(const QList<QString>& coverArtPaths) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     if (!onCoverArtArchiveTaskTerminated()) {
         return;
     }
 
     auto pTrack = std::move(m_pTrack);
+
+    if (!coverArtPaths.isEmpty()) {
+        const QString coverArtUrl = coverArtPaths.first();
+        QUrl url(coverArtUrl);
+        coverArtSendImage(url);
+    } else {
+        // Since all the failures happened in the first place (coverartarchivetask)
+        // All of my tests didn't get any errors with this image task
+        // What should I do in this case?
+        qDebug() << "Cover Image Failed";
+    }
+
     cancel();
+}
+
+void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverInfo) {
+    emit fetchedCoverUpdate(coverInfo);
 }

@@ -22,25 +22,20 @@ void DlgCoverArtFetchedFullSize::closeEvent(QCloseEvent* event) {
     }
 }
 
-//This method is going to use the ByteArray of the fetched images.
-//For now it will use the default cover's location.
 void DlgCoverArtFetchedFullSize::init(const QByteArray& data) {
-    //This is only for testing, will be deleted later.
-    auto defaultCover = QPixmap(CoverArtUtils::defaultCoverLocation());
-
     QPixmap image;
     image.loadFromData(data);
-    //It will pop with the w and h of the fetched cover art.
     resize(image.size().width(), image.size().height());
     show();
     raise();
     activateWindow();
-    // TODO: This can be changed to release info found on the musicbrainz
+    // TODO(fatihemreyildiz):
+    // This can be changed to release info found on the musicbrainz
     QString fetchedCoverArtWindowTitle = "Fetched Cover Art";
 
     setWindowTitle(fetchedCoverArtWindowTitle);
 
-    coverArt->setPixmap(defaultCover);
+    coverArt->setPixmap(image);
 }
 
 void DlgCoverArtFetchedFullSize::mousePressEvent(QMouseEvent* event) {

@@ -15,17 +15,9 @@ namespace {
 
 const Logger kLogger("CoverArtArchiveImageTask");
 
-const QUrl kBaseUrl = QStringLiteral(
-        "http://coverartarchive.org/release/"
-        "f79a29d3-70a3-47ed-a2c4-8779d32411b1/26136610492-250.jpg");
-
-const QString kRequestPath = QStringLiteral("/ws/2/recording/");
-
-QNetworkRequest createNetworkRequest() {
-    DEBUG_ASSERT(kBaseUrl.isValid());
-    QUrl url = kBaseUrl;
-    DEBUG_ASSERT(url.isValid());
-    QNetworkRequest networkRequest(url);
+QNetworkRequest createNetworkRequest(const QUrl& thumbnailUrl) {
+    DEBUG_ASSERT(thumbnailUrl.isValid());
+    QNetworkRequest networkRequest(thumbnailUrl);
     return networkRequest;
 }
 
@@ -33,12 +25,12 @@ QNetworkRequest createNetworkRequest() {
 
 CoverArtArchiveImageTask::CoverArtArchiveImageTask(
         QNetworkAccessManager* networkAccessManager,
-        const QString& coverUrl,
+        const QUrl& coverUrl,
         QObject* parent)
         : network::WebTask(
                   networkAccessManager,
-                  parent) {
-    qDebug() << "CoverArtArchiveImageTask::CoverArtArchiveImageTask";
+                  parent),
+          m_ThumbnailUrl(coverUrl) {
 }
 
 QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
@@ -47,10 +39,8 @@ QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
     networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     DEBUG_ASSERT(networkAccessManager);
-    qDebug() << "CoverArtArchiveImageTask::doStartNetworkRequest";
-
     const QNetworkRequest networkRequest =
-            createNetworkRequest();
+            createNetworkRequest(m_ThumbnailUrl);
 
     if (kLogger.traceEnabled()) {
         kLogger.trace()
@@ -74,20 +64,9 @@ void CoverArtArchiveImageTask::doNetworkReplyFinished(
                 << "body:" << body;
         return;
     }
-    qDebug() << body;
-    qDebug() << "This is the ByteArray of the image. This can be used to present the cover-art";
-}
 
-void CoverArtArchiveImageTask::emitSucceeded(
-        const QByteArray& imageInfo) {
-    VERIFY_OR_DEBUG_ASSERT(
-            isSignalFuncConnected(&CoverArtArchiveImageTask::succeeded)) {
-        kLogger.warning()
-                << "Unhandled succeeded signal";
-        deleteLater();
-        return;
-    }
-    emit succeeded(imageInfo);
+    qDebug() << "Second label cover art should have been updated.";
+    emit succeeded(body);
 }
 
 void CoverArtArchiveImageTask::emitFailed(

@@ -116,16 +116,10 @@ void CoverArtArchiveTask::onFinished(
         const auto imageLink =
                 imageObject.value(QLatin1String("image")).toString();
 
-        qDebug() << "Original image";
-        qDebug() << imageLink; // Just to see image link.
-
         const auto thumbnails =
                 imageObject.value(QLatin1String("thumbnails")).toObject();
 
         for (const auto& thumbnail : thumbnails) {
-            qDebug() << "One of the thumbnail of the cover art";
-            qDebug() << thumbnail.toString(); // Just to see the thumbnails.
-
             if (thumbnail.isUndefined()) {
                 if (kLogger.debugEnabled()) {
                     kLogger.debug()
@@ -140,8 +134,6 @@ void CoverArtArchiveTask::onFinished(
             }
         }
     }
-    qDebug() << "List of cover art paths, thumbnails.";
-    qDebug() << coverArtPaths; // Just to see all the thumbnails.
     emitSucceeded(coverArtPaths);
 }
 

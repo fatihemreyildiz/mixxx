@@ -5,14 +5,14 @@
 #include "network/webtask.h"
 
 namespace mixxx {
-// This task is just for to get Images from the coverartarchive.
+
 class CoverArtArchiveImageTask : public network::WebTask {
     Q_OBJECT
 
   public:
     CoverArtArchiveImageTask(
             QNetworkAccessManager* networkAccessManager,
-            const QString& coverUrl,
+            const QUrl& coverUrl,
             QObject* parent = nullptr);
     ~CoverArtArchiveImageTask() override = default;
 
@@ -32,13 +32,12 @@ class CoverArtArchiveImageTask : public network::WebTask {
             QNetworkReply* finishedNetworkReply,
             network::HttpStatusCode statusCode) override;
 
-    void emitSucceeded(
-            const QByteArray& imageInfo);
-
     void emitFailed(
             const network::WebResponse& response,
             int errorCode,
             const QString& errorMessage);
+
+    const QUrl m_ThumbnailUrl;
 };
 
 } // namespace mixxx
