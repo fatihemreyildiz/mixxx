@@ -66,13 +66,6 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
 
     const TrackModel* const m_pTrackModel;
 
-    void slotCoverFound(
-            const QObject* pRequestor,
-            const CoverInfo& coverInfo,
-            const QPixmap& pixmap,
-            mixxx::cache_key_t requestedCacheKey,
-            bool coverInfoUpdated);
-
     TagFetcher m_tagFetcher;
 
     TrackPointer m_track;

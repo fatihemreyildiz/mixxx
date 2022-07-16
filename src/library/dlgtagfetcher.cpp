@@ -97,11 +97,7 @@ void DlgTagFetcher::init() {
             this,
             &DlgTagFetcher::
                     fetchCoverArt); // This button sends GET request
-    connect(btnImage,
-            &QPushButton::clicked,
-            this,
-            &DlgTagFetcher::
-                    fetchCoverArtImage);
+
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);
