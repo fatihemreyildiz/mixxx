@@ -26,9 +26,6 @@ class TagFetcher : public QObject {
     void startFetch(
             TrackPointer pTrack);
 
-    void coverArtSend(const QString& albumReleaseId);
-    void coverArtSendImage(const QUrl& coverUrl);
-
   public slots:
     void cancel();
 
@@ -44,6 +41,7 @@ class TagFetcher : public QObject {
             const QString& message,
             int code);
     void fetchedCoverUpdate(const QByteArray& coverInfo);
+    void coverArtThumbnailFetchAvailable(const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
 
   private slots:
     void slotFingerprintReady();
@@ -70,7 +68,7 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
 
-    void slotCoverArtArchiveTaskSucceeded(const QList<QString>& coverArtPaths);
+    void slotCoverArtArchiveTaskSucceeded(const QMap<QUuid, QString>& coverArtThumbnailUrls);
     void slotCoverArtArchiveTaskFailed(
             const mixxx::network::JsonWebResponse& response);
     void slotCoverArtArchiveTaskAborted();
@@ -80,12 +78,22 @@ class TagFetcher : public QObject {
             const mixxx::network::WebResponseWithContent& responseWithContent);
     void slotCoverArtArchiveTaskNotFound();
 
-    void slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverInfo);
+    void slotCoverArtArchiveImageTaskSucceeded(const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
+    void slotCoverArtArchiveImageTaskFailed(
+            const mixxx::network::WebResponse& response,
+            int errorCode,
+            const QString& errorMessage);
+    void slotCoverArtArchiveImageTaskAborted();
+    void slotCoverArtArchiveImageTaskNetworkError(
+            QNetworkReply::NetworkError errorCode,
+            const QString& errorString,
+            const mixxx::network::WebResponseWithContent& responseWithContent);
 
   private:
     bool onAcoustIdTaskTerminated();
     bool onMusicBrainzTaskTerminated();
     bool onCoverArtArchiveTaskTerminated();
+    bool onCoverArtArchiveImageTaskTerminated();
 
     QNetworkAccessManager m_network;
 

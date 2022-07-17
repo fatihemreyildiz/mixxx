@@ -27,6 +27,7 @@ class AcoustIdLookupTask : public network::JsonWebTask {
     QNetworkReply* sendNetworkRequest(
             QNetworkAccessManager* networkAccessManager,
             network::HttpRequestMethod method,
+            int parentTimeoutMillis,
             const QUrl& url,
             const QJsonDocument& content) override;
 

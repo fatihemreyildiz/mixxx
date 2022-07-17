@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QList>
+#include <QMap>
+#include <QUuid>
 
 #include "network/webtask.h"
 
@@ -12,13 +14,13 @@ class CoverArtArchiveImageTask : public network::WebTask {
   public:
     CoverArtArchiveImageTask(
             QNetworkAccessManager* networkAccessManager,
-            const QUrl& coverUrl,
+            const QMap<QUuid, QString>& smallThumbnailsUrls,
             QObject* parent = nullptr);
     ~CoverArtArchiveImageTask() override = default;
 
   signals:
     void succeeded(
-            const QByteArray& imageInfo);
+            const QMap<QUuid, QByteArray>& m_smallThumbnailBytes);
     void failed(
             const network::WebResponse& response,
             int errorCode,
@@ -32,12 +34,18 @@ class CoverArtArchiveImageTask : public network::WebTask {
             QNetworkReply* finishedNetworkReply,
             network::HttpStatusCode statusCode) override;
 
+    void emitSuceeded(const QMap<QUuid, QByteArray>& m_smallThumbnailBytes);
+
     void emitFailed(
             const network::WebResponse& response,
             int errorCode,
             const QString& errorMessage);
 
-    const QUrl m_ThumbnailUrl;
+    QMap<QUuid, QString> m_queuedSmallThumbnailUrls;
+
+    QMap<QUuid, QByteArray> m_smallThumbnailBytes;
+
+    int m_parentTimeoutMillis;
 };
 
 } // namespace mixxx

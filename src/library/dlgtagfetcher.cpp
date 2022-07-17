@@ -106,9 +106,9 @@ void DlgTagFetcher::init() {
     connect(&m_tagFetcher, &TagFetcher::networkError, this, &DlgTagFetcher::slotNetworkResult);
 
     connect(&m_tagFetcher,
-            &TagFetcher::fetchedCoverUpdate,
+            &TagFetcher::coverArtThumbnailFetchAvailable,
             this,
-            &DlgTagFetcher::slotCoverFoundWeb);
+            &DlgTagFetcher::fetchThumbnailFinished);
 
     CoverArtCache* pCache = CoverArtCache::instance();
     if (pCache) {
@@ -142,6 +142,22 @@ void DlgTagFetcher::loadTrackInternal(const TrackPointer& track) {
         return;
     }
     results->clear();
+    //This is added because if the track changed prev or next
+    //Previous results of cover arts were on the second label
+    //This deletes the results of cover arts from previous track.
+    m_resultsThumbnails.clear();
+
+    //This is also added because of the same situation,
+    //After we change the track fetched cover art from previous
+    //Track stays there.
+    CoverInfo coverInfo;
+    QPixmap pixmap;
+    m_pFetchedCoverArt->setCoverArt(coverInfo, pixmap);
+
+    //Same for the status, I think i need a better solution for these.
+    QString status = "Cover Arts Fetching";
+    coverArtStatus->setText(status);
+
     disconnect(m_track.get(),
             &Track::changed,
             this,
@@ -265,18 +281,6 @@ void DlgTagFetcher::loadCurrentTrackCover() {
     pCache->requestTrackCover(this, m_track);
 }
 
-void DlgTagFetcher::fetchCoverArt() {
-    int resultIndex = m_data.m_selectedResult;
-
-    if (resultIndex < 0) {
-        return;
-    }
-    const mixxx::musicbrainz::TrackRelease& trackRelease =
-            m_data.m_results[resultIndex];
-    const QString coverArtArchiveMbid = trackRelease.albumReleaseId.toString(QUuid::WithoutBraces);
-    m_tagFetcher.coverArtSend(coverArtArchiveMbid);
-}
-
 void DlgTagFetcher::fetchTagProgress(const QString& text) {
     QString status = tr("Status: %1");
     loadingStatus->setText(status.arg(text));
@@ -386,6 +390,22 @@ void DlgTagFetcher::resultSelected() {
 
     const int resultIndex = results->currentItem()->data(0, Qt::UserRole).toInt();
     m_data.m_selectedResult = resultIndex;
+
+    CoverInfo coverInfo;
+    QPixmap pixmap;
+
+    if (!m_resultsThumbnails.isEmpty()) {
+        if (resultIndex < 0) {
+            m_pFetchedCoverArt->setCoverArt(coverInfo, pixmap);
+        } else {
+            const mixxx::musicbrainz::TrackRelease& trackRelease = m_data.m_results[resultIndex];
+            if (m_resultsThumbnails.contains(trackRelease.albumReleaseId)) {
+                updateFetchedCoverArtLayout(m_resultsThumbnails.value(trackRelease.albumReleaseId));
+            } else {
+                m_pFetchedCoverArt->setCoverArt(coverInfo, pixmap);
+            }
+        }
+    }
 }
 
 void DlgTagFetcher::slotCoverFound(
@@ -404,13 +424,54 @@ void DlgTagFetcher::slotCoverFound(
     }
 }
 
-void DlgTagFetcher::slotCoverFoundWeb(const QByteArray& data) {
-    QPixmap image;
-    image.loadFromData(data);
+void DlgTagFetcher::updateFetchedCoverArtLayout(const QByteArray& thumbnailResultBytes) {
+    QPixmap fetchedThumbnailPixmap;
+    fetchedThumbnailPixmap.loadFromData(thumbnailResultBytes);
     CoverInfo coverInfo;
     coverInfo.type = CoverInfo::NONE;
     coverInfo.source = CoverInfo::USER_SELECTED;
     coverInfo.setImage();
-    m_pFetchedCoverArt->loadData(data); //This data loaded because for full size.
-    m_pFetchedCoverArt->setCoverArt(coverInfo, image);
+    m_pFetchedCoverArt->loadData(thumbnailResultBytes); //This data loaded because for full size.
+    m_pFetchedCoverArt->setCoverArt(coverInfo, fetchedThumbnailPixmap);
+}
+
+void DlgTagFetcher::fetchCoverArt() {
+    int resultIndex = m_data.m_selectedResult;
+    if (resultIndex < 0) {
+        return;
+    }
+    const mixxx::musicbrainz::TrackRelease& trackRelease = m_data.m_results[resultIndex];
+    if (m_resultsThumbnails.contains(trackRelease.albumReleaseId)) {
+        downloadCoverAndApply(m_resultsThumbnails.value(trackRelease.albumReleaseId));
+    } else
+        return;
+}
+
+void DlgTagFetcher::downloadCoverAndApply(const QByteArray& data) {
+    QString coverArtLocation = m_track->getLocation() + ".jpg";
+    QFile coverArtFile(coverArtLocation);
+    coverArtFile.open(QIODevice::WriteOnly);
+    coverArtFile.write(data);
+    coverArtFile.close();
+
+    auto selectedCover = mixxx::FileAccess(mixxx::FileInfo(coverArtLocation));
+    QImage updatedCoverArtFound(coverArtLocation);
+    if (updatedCoverArtFound.isNull()) {
+        return;
+    }
+
+    CoverInfoRelative coverInfo;
+    coverInfo.type = CoverInfo::FILE;
+    coverInfo.source = CoverInfo::USER_SELECTED;
+    coverInfo.coverLocation = coverArtLocation;
+    coverInfo.setImage(updatedCoverArtFound);
+    m_pCurrentCoverArt->setCoverArt(CoverInfo{}, QPixmap::fromImage(updatedCoverArtFound));
+    m_track->setCoverInfo(coverInfo);
+}
+
+void DlgTagFetcher::fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes) {
+    QString status = "Cover Arts Found";
+    coverArtStatus->setText(status);
+    m_resultsThumbnails = thumbnailBytes;
+    updateStack();
 }

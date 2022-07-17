@@ -41,6 +41,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void fetchTagFinished(
             TrackPointer pTrack,
             const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
+    void fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes);
     void resultSelected();
     void fetchTagProgress(const QString&);
     void slotNetworkResult(int httpStatus, const QString& app, const QString& message, int code);
@@ -56,7 +57,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
             const QPixmap& pixmap,
             mixxx::cache_key_t requestedCacheKey,
             bool coverInfoUpdated);
-    void slotCoverFoundWeb(const QByteArray& data);
+    void updateFetchedCoverArtLayout(const QByteArray& thumbnailResultBytes);
+    void downloadCoverAndApply(const QByteArray& data);
 
   private:
     void loadCurrentTrackCover();
@@ -76,6 +78,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     parented_ptr<CoverArtLabel> m_pFetchedCoverArt;
 
     mixxx::TrackRecord m_trackRecord;
+
+    QMap<QUuid, QByteArray> m_resultsThumbnails;
 
     struct Data {
         Data()

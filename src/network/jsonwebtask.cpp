@@ -29,6 +29,9 @@ const QString JSON_CONTENT_TYPE = "application/json";
 
 const QMimeType JSON_MIME_TYPE = QMimeDatabase().mimeTypeForName(JSON_CONTENT_TYPE);
 
+// This is also added for 404 on CoverArtArchive.
+const QMimeType HTML = QMimeDatabase().mimeTypeForName("text/html");
+
 /// If parsing fails the functions returns std::nullopt and optionally
 /// the response content in pInvalidResponseContent for further processing.
 std::optional<QJsonDocument> readJsonContent(
@@ -38,6 +41,9 @@ std::optional<QJsonDocument> readJsonContent(
     DEBUG_ASSERT(JSON_MIME_TYPE.isValid());
     auto contentType = WebTask::readContentType(*reply);
     auto optContentData = WebTask::readContentData(reply);
+    if (contentType == HTML) {
+        return QJsonDocument{};
+    }
     if (contentType !=
             JSON_MIME_TYPE) {
         kLogger.debug()
@@ -139,6 +145,7 @@ void JsonWebTask::onFinishedCustom(
 QNetworkReply* JsonWebTask::sendNetworkRequest(
         QNetworkAccessManager* networkAccessManager,
         HttpRequestMethod method,
+        int parentTimeoutMillis,
         const QUrl& url,
         const QJsonDocument& content) {
     switch (method) {
@@ -239,6 +246,7 @@ QNetworkReply* JsonWebTask::doStartNetworkRequest(
     return sendNetworkRequest(
             networkAccessManager,
             m_request.method,
+            parentTimeoutMillis,
             url,
             m_request.content);
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QList>
+#include <QMap>
 #include <QString>
+#include <QUuid>
 
 #include "network/jsonwebtask.h"
 
@@ -13,14 +15,14 @@ class CoverArtArchiveTask : public network::JsonWebTask {
   public:
     CoverArtArchiveTask(
             QNetworkAccessManager* networkAccessManager,
-            const QString& releaseId,
+            QList<QUuid>&& albumReleaseIds,
             QObject* parent = nullptr);
 
     ~CoverArtArchiveTask() override = default;
 
   signals:
     void succeeded(
-            const QList<QString>& coverArtPaths);
+            const QMap<QUuid, QString>& smallThumbnailUrls);
 
     void failed(
             const mixxx::network::JsonWebResponse& response);
@@ -29,6 +31,7 @@ class CoverArtArchiveTask : public network::JsonWebTask {
     QNetworkReply* sendNetworkRequest(
             QNetworkAccessManager* networkAccessManager,
             network::HttpRequestMethod method,
+            int parentTimeoutMillis,
             const QUrl& url,
             const QJsonDocument& content) override;
 
@@ -36,8 +39,19 @@ class CoverArtArchiveTask : public network::JsonWebTask {
             const network::JsonWebResponse& response) override;
 
     void emitSucceeded(
-            const QList<QString>& recordingIds);
+            const QMap<QUuid, QString>& smallThumbnailUrls);
 
-    const QString m_AlbumReleaseId;
+    void emitAllUrls();
+
+    QList<QUuid> m_queuedAlbumReleaseIds;
+
+    QList<QString> m_allThumbnailUrls;
+
+    QMap<QUuid, QString> m_smallThumbnailUrls;
+
+    QMap<QUuid, QList<QString>> m_coverArtUrls; // This can be used later on when
+                                                // preferences implementation.
+
+    int m_parentTimeoutMillis;
 };
 } // namespace mixxx

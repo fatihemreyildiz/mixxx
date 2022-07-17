@@ -15,9 +15,10 @@ namespace {
 
 const Logger kLogger("CoverArtArchiveImageTask");
 
-QNetworkRequest createNetworkRequest(const QUrl& thumbnailUrl) {
-    DEBUG_ASSERT(thumbnailUrl.isValid());
-    QNetworkRequest networkRequest(thumbnailUrl);
+QNetworkRequest createNetworkRequest(const QString& smallThumbnailUrl) {
+    QUrl url = smallThumbnailUrl;
+    DEBUG_ASSERT(url.isValid());
+    QNetworkRequest networkRequest(url);
     return networkRequest;
 }
 
@@ -25,12 +26,13 @@ QNetworkRequest createNetworkRequest(const QUrl& thumbnailUrl) {
 
 CoverArtArchiveImageTask::CoverArtArchiveImageTask(
         QNetworkAccessManager* networkAccessManager,
-        const QUrl& coverUrl,
+        const QMap<QUuid, QString>& smallThumbnailsUrls,
         QObject* parent)
         : network::WebTask(
                   networkAccessManager,
                   parent),
-          m_ThumbnailUrl(coverUrl) {
+          m_queuedSmallThumbnailUrls(smallThumbnailsUrls),
+          m_parentTimeoutMillis(0) {
 }
 
 QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
@@ -39,8 +41,18 @@ QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
     networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     DEBUG_ASSERT(networkAccessManager);
+
+    m_parentTimeoutMillis = parentTimeoutMillis;
+
+    VERIFY_OR_DEBUG_ASSERT(!m_queuedSmallThumbnailUrls.isEmpty()) {
+        return nullptr;
+    }
+
+    const auto smallThumbnailUrl = m_queuedSmallThumbnailUrls.first();
+    DEBUG_ASSERT(!smallThumbnailUrl.isNull());
+
     const QNetworkRequest networkRequest =
-            createNetworkRequest(m_ThumbnailUrl);
+            createNetworkRequest(smallThumbnailUrl);
 
     if (kLogger.traceEnabled()) {
         kLogger.trace()
@@ -55,18 +67,35 @@ void CoverArtArchiveImageTask::doNetworkReplyFinished(
         network::HttpStatusCode statusCode) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
 
-    const QByteArray body = finishedNetworkReply->readAll();
+    const QByteArray resultImageBytes = finishedNetworkReply->readAll();
 
     if (statusCode != 200) {
         kLogger.info()
                 << "GET reply"
                 << "statusCode:" << statusCode
-                << "body:" << body;
+                << "resultImageBytes:" << resultImageBytes;
         return;
     }
 
-    qDebug() << "Second label cover art should have been updated.";
-    emit succeeded(body);
+    m_smallThumbnailBytes.insert(m_queuedSmallThumbnailUrls.firstKey(), resultImageBytes);
+    m_queuedSmallThumbnailUrls.erase(m_queuedSmallThumbnailUrls.begin());
+    if (m_queuedSmallThumbnailUrls.isEmpty()) {
+        qDebug() << m_smallThumbnailBytes.size() << " Cover arts found.";
+        succeeded(m_smallThumbnailBytes);
+        return;
+    }
+    slotStart(m_parentTimeoutMillis);
+}
+
+void CoverArtArchiveImageTask::emitSuceeded(const QMap<QUuid, QByteArray>& m_smallThumbnailBytes) {
+    VERIFY_OR_DEBUG_ASSERT(
+            isSignalFuncConnected(&CoverArtArchiveImageTask::succeeded)) {
+        kLogger.warning()
+                << "Unhandled succeeded signal";
+        deleteLater();
+        return;
+    }
+    emit succeeded(m_smallThumbnailBytes);
 }
 
 void CoverArtArchiveImageTask::emitFailed(

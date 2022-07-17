@@ -62,6 +62,14 @@ void TagFetcher::cancel() {
         m_pMusicBrainzTask->invokeAbort();
         DEBUG_ASSERT(!m_pMusicBrainzTask);
     }
+    if (m_pCoverArtArchiveTask) {
+        m_pCoverArtArchiveTask->invokeAbort();
+        DEBUG_ASSERT(!m_pCoverArtArchiveTask);
+    }
+    if (m_pCoverArtArchiveImageTask) {
+        m_pCoverArtArchiveImageTask->invokeAbort();
+        DEBUG_ASSERT(!m_pCoverArtArchiveImageTask);
+    }
 }
 
 void TagFetcher::slotFingerprintReady() {
@@ -153,52 +161,6 @@ void TagFetcher::slotAcoustIdTaskSucceeded(
             &TagFetcher::slotMusicBrainzTaskNetworkError);
     m_pMusicBrainzTask->invokeStart(
             kMusicBrainzTimeoutMillis);
-}
-
-void TagFetcher::coverArtSend(const QString& albumReleaseId) {
-    m_pCoverArtArchiveTask = make_parented<mixxx::CoverArtArchiveTask>(
-            &m_network,
-            albumReleaseId,
-            this);
-
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::succeeded,
-            this,
-            &TagFetcher::slotCoverArtArchiveTaskSucceeded);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::failed,
-            this,
-            &TagFetcher::slotCoverArtArchiveTaskFailed);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::aborted,
-            this,
-            &TagFetcher::slotCoverArtArchiveTaskAborted);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::notFound,
-            this,
-            &TagFetcher::slotCoverArtArchiveTaskNotFound);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::networkError,
-            this,
-            &TagFetcher::slotCoverArtArchiveTaskNetworkError);
-
-    m_pCoverArtArchiveTask->invokeStart(
-            kCoverArtArchiveTimeoutMilis);
-}
-
-void TagFetcher::coverArtSendImage(const QUrl& coverUrl) {
-    m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
-            &m_network,
-            coverUrl,
-            this);
-
-    connect(m_pCoverArtArchiveImageTask,
-            &mixxx::CoverArtArchiveImageTask::succeeded,
-            this,
-            &TagFetcher::slotCoverArtArchiveImageTaskSucceeded);
-
-    m_pCoverArtArchiveImageTask->invokeStart(
-            kCoverArtArchiveImageTimeoutMilis);
 }
 
 bool TagFetcher::onAcoustIdTaskTerminated() {
@@ -328,6 +290,40 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
 
     auto pTrack = std::move(m_pTrack);
     cancel();
+    QList<QUuid> albumReleaseIds;
+
+    foreach (auto& guessedTrackRelease, guessedTrackReleases) {
+        albumReleaseIds.append(guessedTrackRelease.albumReleaseId);
+    }
+
+    m_pCoverArtArchiveTask = make_parented<mixxx::CoverArtArchiveTask>(
+            &m_network,
+            std::move(albumReleaseIds),
+            this);
+
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::succeeded,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskSucceeded);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::failed,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskFailed);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::aborted,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskAborted);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::networkError,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskNetworkError);
+    connect(m_pCoverArtArchiveTask,
+            &mixxx::CoverArtArchiveTask::notFound,
+            this,
+            &TagFetcher::slotCoverArtArchiveTaskNotFound);
+
+    m_pCoverArtArchiveTask->invokeStart(
+            kCoverArtArchiveTimeoutMilis);
 
     emit resultAvailable(
             std::move(pTrack),
@@ -401,28 +397,109 @@ void TagFetcher::slotCoverArtArchiveTaskFailed(
             -1);
 }
 
-void TagFetcher::slotCoverArtArchiveTaskSucceeded(const QList<QString>& coverArtPaths) {
+void TagFetcher::slotCoverArtArchiveTaskSucceeded(
+        const QMap<QUuid, QString>& coverArtThumbnailUrls) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
     if (!onCoverArtArchiveTaskTerminated()) {
         return;
     }
 
     auto pTrack = std::move(m_pTrack);
+    cancel();
 
-    if (!coverArtPaths.isEmpty()) {
-        const QString coverArtUrl = coverArtPaths.first();
-        QUrl url(coverArtUrl);
-        coverArtSendImage(url);
-    } else {
-        // Since all the failures happened in the first place (coverartarchivetask)
-        // All of my tests didn't get any errors with this image task
-        // What should I do in this case?
-        qDebug() << "Cover Image Failed";
+    m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
+            &m_network,
+            std::move(coverArtThumbnailUrls),
+            this);
+
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::succeeded,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskSucceeded);
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::failed,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskFailed);
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::aborted,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskAborted);
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::networkError,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskNetworkError);
+
+    m_pCoverArtArchiveImageTask->invokeStart(
+            kCoverArtArchiveImageTimeoutMilis);
+}
+
+void TagFetcher::slotCoverArtArchiveImageTaskAborted() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveImageTaskTerminated()) {
+        return;
     }
 
     cancel();
 }
 
-void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverInfo) {
-    emit fetchedCoverUpdate(coverInfo);
+void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(
+        const QMap<QUuid, QByteArray>& smallThumbnailsBytes) {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveImageTaskTerminated()) {
+        return;
+    }
+    emit coverArtThumbnailFetchAvailable(smallThumbnailsBytes);
+
+    auto pTrack = std::move(m_pTrack);
+}
+
+bool TagFetcher::onCoverArtArchiveImageTaskTerminated() {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    auto* const pCoverArtArchiveImageTask = m_pCoverArtArchiveImageTask.get();
+    DEBUG_ASSERT(sender());
+    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveImageTask ==
+            qobject_cast<mixxx::CoverArtArchiveImageTask*>(sender())) {
+        return false;
+    }
+    m_pCoverArtArchiveImageTask = nullptr;
+    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveImageTask);
+    pCoverArtArchiveImageTask->disconnect(this);
+    return true;
+}
+
+void TagFetcher::slotCoverArtArchiveImageTaskFailed(
+        const mixxx::network::WebResponse& response,
+        int errorCode,
+        const QString& errorMessage) {
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveImageTaskTerminated()) {
+        return;
+    }
+
+    cancel();
+
+    emit networkError(
+            response.statusCode(),
+            "CoverArtImageTask",
+            errorMessage,
+            errorCode);
+}
+
+void TagFetcher::slotCoverArtArchiveImageTaskNetworkError(
+        QNetworkReply::NetworkError errorCode,
+        const QString& errorString,
+        const mixxx::network::WebResponseWithContent& responseWithContent) {
+    Q_UNUSED(responseWithContent);
+    DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
+    if (!onCoverArtArchiveImageTaskTerminated()) {
+        return;
+    }
+
+    cancel();
+
+    emit networkError(
+            mixxx::network::kHttpStatusCodeInvalid,
+            QStringLiteral("CoverArtArchive"),
+            errorString,
+            errorCode);
 }

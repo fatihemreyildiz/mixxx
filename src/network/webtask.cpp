@@ -386,6 +386,14 @@ void WebTask::slotNetworkReplyFinished() {
     }
 
     const auto statusCode = readStatusCode(*pFinishedNetworkReply);
+
+    //Instead of State::NotFound, this can help us to send requests even if there is a failure.
+    if (pFinishedNetworkReply->error() == QNetworkReply::NetworkError::ContentNotFoundError) {
+        m_state = State::Finished;
+        doNetworkReplyFinished(pFinishedNetworkReply, statusCode);
+        return;
+    }
+
     if (pFinishedNetworkReply->error() != QNetworkReply::NetworkError::NoError) {
         onNetworkError(
                 pFinishedNetworkReply->error(),

@@ -104,10 +104,17 @@
            </property>
           </spacer>
          </item>
+        <item>
+          <widget class="QLabel" name="coverArtStatus">
+           <property name="text">
+            <string notr="true">Status: Fetching</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QPushButton" name="btnCover">
            <property name="text">
-            <string>&amp;Look For a Cover Art</string>
+            <string>&amp;Apply Cover Art</string>
            </property>
           </widget>
          </item>

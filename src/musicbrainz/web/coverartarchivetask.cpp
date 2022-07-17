@@ -28,11 +28,11 @@ network::JsonWebRequest lookupRequest() {
 }
 
 QNetworkRequest createNetworkRequest(
-        const QString& releaseID) {
+        const QUuid& releaseID) {
     DEBUG_ASSERT(kBaseUrl.isValid());
     DEBUG_ASSERT(!releaseID.isNull());
     QUrl url = kBaseUrl;
-    url.setPath(kRequestPath + releaseID);
+    url.setPath(kRequestPath + releaseID.toString(QUuid::WithoutBraces));
     DEBUG_ASSERT(url.isValid());
     QNetworkRequest networkRequest(url);
     return networkRequest;
@@ -42,31 +42,38 @@ QNetworkRequest createNetworkRequest(
 
 CoverArtArchiveTask::CoverArtArchiveTask(
         QNetworkAccessManager* networkAccessManager,
-        const QString& releaseId,
+        QList<QUuid>&& albumReleaseIds,
         QObject* parent)
         : network::JsonWebTask(
                   networkAccessManager,
                   kBaseUrl,
                   lookupRequest(),
                   parent),
-          m_AlbumReleaseId(releaseId) {
+          m_queuedAlbumReleaseIds(albumReleaseIds),
+          m_parentTimeoutMillis(0) {
 }
 
 QNetworkReply* CoverArtArchiveTask::sendNetworkRequest(
         QNetworkAccessManager* networkAccessManager,
         network::HttpRequestMethod method,
+        int parentTimeoutMillis,
         const QUrl& url,
         const QJsonDocument& content) {
-    networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
-    const QNetworkRequest networkRequest = createNetworkRequest(m_AlbumReleaseId);
-
     DEBUG_ASSERT(networkAccessManager);
+    DEBUG_ASSERT(!m_queuedAlbumReleaseIds.first().isNull());
+    Q_UNUSED(method);
+    DEBUG_ASSERT(method == network::HttpRequestMethod::Get);
+    networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    m_parentTimeoutMillis = parentTimeoutMillis;
+
+    // It is not takefirst because we will need it to store the QMap's later on, before the new request this index will be deleted
+    const QNetworkRequest networkRequest = createNetworkRequest(m_queuedAlbumReleaseIds.first());
+
     VERIFY_OR_DEBUG_ASSERT(url.isValid()) {
         kLogger.warning() << "Invalid URL" << url;
         return nullptr;
     }
-    Q_UNUSED(method);
-    DEBUG_ASSERT(method == network::HttpRequestMethod::Get);
     if (kLogger.traceEnabled()) {
         kLogger.trace()
                 << "Get"
@@ -77,6 +84,23 @@ QNetworkReply* CoverArtArchiveTask::sendNetworkRequest(
 
 void CoverArtArchiveTask::onFinished(
         const network::JsonWebResponse& response) {
+    //This is added only for to get Url of the images
+    //I tried few ways, they didn't work at all
+    //This was the only one who solved the issue behind
+    //blocking the sequence of requests
+    if (response.statusCode() == 404) {
+        qDebug() << "No image link found for this request";
+        m_queuedAlbumReleaseIds.removeFirst();
+        if (m_queuedAlbumReleaseIds.isEmpty()) {
+            qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
+            // emit all links.
+            emitSucceeded(m_smallThumbnailUrls);
+            return;
+        }
+        slotStart(m_parentTimeoutMillis);
+        return;
+    }
+
     if (!response.isStatusCodeSuccess()) {
         kLogger.warning()
                 << "Request failed with HTTP status code"
@@ -107,38 +131,37 @@ void CoverArtArchiveTask::onFinished(
         return;
     }
 
-    QList<QString> coverArtPaths;
     DEBUG_ASSERT(jsonObject.value(QLatin1String("images")).isArray());
     const QJsonArray images = jsonObject.value(QLatin1String("images")).toArray();
     for (const auto& image : images) {
         DEBUG_ASSERT(image.isObject());
         const auto imageObject = image.toObject();
-        const auto imageLink =
-                imageObject.value(QLatin1String("image")).toString();
-
-        const auto thumbnails =
-                imageObject.value(QLatin1String("thumbnails")).toObject();
-
-        for (const auto& thumbnail : thumbnails) {
-            if (thumbnail.isUndefined()) {
-                if (kLogger.debugEnabled()) {
-                    kLogger.debug()
-                            << "No thumbnail(s) available for image"
-                            << imageLink;
-                }
-                continue;
-            } else {
-                const auto thumbnailLink =
-                        QString(thumbnail.toString());
-                coverArtPaths.append(thumbnailLink);
-            }
-        }
+        const auto thumbnails = imageObject.value(QLatin1String("thumbnails")).toObject();
+        DEBUG_ASSERT(!thumbnails.isEmpty());
+        const auto smallThumbnailUrl = thumbnails.value(QLatin1String("small")).toString();
+        DEBUG_ASSERT(!smallThumbnailUrl.isNull());
+        const auto largeThumbnailUrl = thumbnails.value(QLatin1String("large")).toString();
+        DEBUG_ASSERT(!largeThumbnailUrl.isNull());
+        m_smallThumbnailUrls.insert(m_queuedAlbumReleaseIds.first(), smallThumbnailUrl);
+        //m_allThumbnailUrls.append(largeThumbnailUrl);
+        //m_allThumbnailUrls.append(smallThumbnailUrl);
+        //m_coverArtUrls.insert(m_queuedAlbumReleaseIds.first(), m_allThumbnailUrls);
+        break;
     }
-    emitSucceeded(coverArtPaths);
+    m_queuedAlbumReleaseIds.removeFirst();
+    if (m_queuedAlbumReleaseIds.isEmpty()) {
+        qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
+        //TODO: Emit all links
+        emitSucceeded(m_smallThumbnailUrls);
+        return;
+    }
+    DEBUG_ASSERT(!m_queuedAlbumReleaseIds.isEmpty());
+    // Continue with next album release id
+    slotStart(m_parentTimeoutMillis);
 }
 
-void CoverArtArchiveTask::emitSucceeded( //Dummy function, will be developed later.
-        const QList<QString>& coverArtPaths) {
+void CoverArtArchiveTask::emitSucceeded(
+        const QMap<QUuid, QString>& coverArtThumbnailUrls) {
     VERIFY_OR_DEBUG_ASSERT(
             isSignalFuncConnected(&CoverArtArchiveTask::succeeded)) {
         kLogger.warning()
@@ -146,7 +169,7 @@ void CoverArtArchiveTask::emitSucceeded( //Dummy function, will be developed lat
         deleteLater();
         return;
     }
-    emit succeeded(coverArtPaths);
+    emit succeeded(coverArtThumbnailUrls);
 }
 
 } // namespace mixxx
