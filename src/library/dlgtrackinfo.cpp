@@ -42,7 +42,7 @@ DlgTrackInfo::DlgTrackInfo(
         : QDialog(nullptr),
           m_pTrackModel(trackModel),
           m_tapFilter(this, kFilterLength, kMaxInterval),
-          m_pWCoverArtLabel(make_parented<WCoverArtLabel>(this)),
+          m_pWCoverArtLabel(make_parented<WCoverArtLabel>(this, new WCoverArtMenu)),
           m_pWStarRating(make_parented<WStarRating>(nullptr, this)) {
     init();
 }

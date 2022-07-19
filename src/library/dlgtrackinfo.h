@@ -16,6 +16,7 @@
 class TrackModel;
 class DlgTagFetcher;
 class WCoverArtLabel;
+class WCoverArtMenu;
 class WStarRating;
 
 /// A dialog box to display and edit track properties.
@@ -101,6 +102,8 @@ class DlgTrackInfo : public QDialog, public Ui::DlgTrackInfo {
     void updateSpinBpmFromBeats();
 
     const TrackModel* const m_pTrackModel;
+
+    WCoverArtMenu* m_pCoverArtMenu;
 
     TrackPointer m_pLoadedTrack;
 

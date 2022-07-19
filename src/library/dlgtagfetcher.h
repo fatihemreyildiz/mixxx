@@ -4,15 +4,15 @@
 #include <QList>
 #include <QTreeWidget>
 
-#include "library/coverartlabel.h"
 #include "library/trackmodel.h"
 #include "library/ui_dlgtagfetcher.h"
 #include "musicbrainz/tagfetcher.h"
 #include "track/track_decl.h"
 #include "track/trackrecord.h"
 #include "util/parented_ptr.h"
+#include "widget/wcoverartmenu.h"
 
-class CoverArtLabel;
+class WCoverArtLabel;
 
 /// A dialog box to fetch track metadata from MusicBrainz.
 /// Use TrackPointer to load a track into the dialog or
@@ -70,8 +70,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
 
     QModelIndex m_currentTrackIndex;
 
-    parented_ptr<CoverArtLabel> m_pCurrentCoverArt;
-    parented_ptr<CoverArtLabel> m_pFetchedCoverArt;
+    parented_ptr<WCoverArtLabel> m_pCurrentCoverArt;
+    parented_ptr<WCoverArtLabel> m_pFetchedCoverArt;
 
     mixxx::TrackRecord m_trackRecord;
 

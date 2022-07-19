@@ -9,6 +9,7 @@
 #include "moc_dlgtagfetcher.cpp"
 #include "track/track.h"
 #include "track/tracknumbers.h"
+#include "widget/wcoverartlabel.h"
 
 namespace {
 
@@ -65,8 +66,8 @@ DlgTagFetcher::DlgTagFetcher(
         : QDialog(nullptr),
           m_pTrackModel(pTrackModel),
           m_tagFetcher(this),
-          m_pCurrentCoverArt(make_parented<CoverArtLabel>(this)),
-          m_pFetchedCoverArt(make_parented<CoverArtLabel>(this)),
+          m_pCurrentCoverArt(make_parented<WCoverArtLabel>(this, new WCoverArtMenu)),
+          m_pFetchedCoverArt(make_parented<WCoverArtLabel>(this)),
           m_networkResult(NetworkResult::Ok) {
     init();
 }
