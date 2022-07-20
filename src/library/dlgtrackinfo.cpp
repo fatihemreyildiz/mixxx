@@ -42,7 +42,8 @@ DlgTrackInfo::DlgTrackInfo(
         : QDialog(nullptr),
           m_pTrackModel(trackModel),
           m_tapFilter(this, kFilterLength, kMaxInterval),
-          m_pWCoverArtLabel(make_parented<WCoverArtLabel>(this, new WCoverArtMenu)),
+          m_pWCoverArtMenu(new WCoverArtMenu(this)),
+          m_pWCoverArtLabel(make_parented<WCoverArtLabel>(this, m_pWCoverArtMenu)),
           m_pWStarRating(make_parented<WStarRating>(nullptr, this)) {
     init();
 }
@@ -230,12 +231,12 @@ void DlgTrackInfo::init() {
                 this,
                 &DlgTrackInfo::slotCoverFound);
     }
-    connect(m_pWCoverArtLabel.get(),
-            &WCoverArtLabel::coverInfoSelected,
+    connect(m_pWCoverArtMenu,
+            &WCoverArtMenu::coverInfoSelected,
             this,
             &DlgTrackInfo::slotCoverInfoSelected);
-    connect(m_pWCoverArtLabel.get(),
-            &WCoverArtLabel::reloadCoverArt,
+    connect(m_pWCoverArtMenu,
+            &WCoverArtMenu::reloadCoverArt,
             this,
             &DlgTrackInfo::slotReloadCoverArt);
 }

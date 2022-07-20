@@ -103,8 +103,6 @@ class DlgTrackInfo : public QDialog, public Ui::DlgTrackInfo {
 
     const TrackModel* const m_pTrackModel;
 
-    WCoverArtMenu* m_pCoverArtMenu;
-
     TrackPointer m_pLoadedTrack;
 
     QModelIndex m_currentTrackIndex;
@@ -117,6 +115,7 @@ class DlgTrackInfo : public QDialog, public Ui::DlgTrackInfo {
     TapFilter m_tapFilter;
     mixxx::Bpm m_lastTapedBpm;
 
+    WCoverArtMenu* m_pWCoverArtMenu;
     parented_ptr<WCoverArtLabel> m_pWCoverArtLabel;
     parented_ptr<WStarRating> m_pWStarRating;
 

@@ -32,22 +32,12 @@ QPixmap createDefaultCover(QWidget* parent) {
 
 WCoverArtLabel::WCoverArtLabel(QWidget* parent, WCoverArtMenu* pCoverMenu)
         : QLabel(parent),
-          m_pCoverMenu(pCoverMenu),
+          m_pWCoverArtMenu(pCoverMenu),
           m_pDlgFullSize(make_parented<DlgCoverArtFullSize>(this)),
           m_defaultCover(createDefaultCover(this)) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setFrameShape(QFrame::Box);
     setAlignment(Qt::AlignCenter);
-    if (m_pCoverMenu != nullptr) {
-        connect(m_pCoverMenu,
-                &WCoverArtMenu::coverInfoSelected,
-                this,
-                &WCoverArtLabel::coverInfoSelected);
-        connect(m_pCoverMenu,
-                &WCoverArtMenu::reloadCoverArt,
-                this,
-                &WCoverArtLabel::reloadCoverArt);
-    }
     setPixmap(m_defaultCover);
 }
 
@@ -55,8 +45,8 @@ WCoverArtLabel::~WCoverArtLabel() = default;
 
 void WCoverArtLabel::setCoverArt(const CoverInfo& coverInfo,
         const QPixmap& px) {
-    if (m_pCoverMenu != nullptr) {
-        m_pCoverMenu->setCoverArt(coverInfo);
+    if (m_pWCoverArtMenu != nullptr) {
+        m_pWCoverArtMenu->setCoverArt(coverInfo);
         if (px.isNull()) {
             m_loadedCover = px;
             setPixmap(m_defaultCover);
@@ -76,18 +66,18 @@ void WCoverArtLabel::setCoverArt(const CoverInfo& coverInfo,
 }
 
 void WCoverArtLabel::slotCoverMenu(const QPoint& pos) {
-    if (m_pCoverMenu == nullptr) {
+    if (m_pWCoverArtMenu == nullptr) {
         return;
     }
-    m_pCoverMenu->popup(mapToGlobal(pos));
+    m_pWCoverArtMenu->popup(mapToGlobal(pos));
 }
 
 void WCoverArtLabel::contextMenuEvent(QContextMenuEvent* event) {
-    if (m_pCoverMenu == nullptr) {
+    if (m_pWCoverArtMenu == nullptr) {
         return;
     }
     event->accept();
-    m_pCoverMenu->popup(event->globalPos());
+    m_pWCoverArtMenu->popup(event->globalPos());
 }
 
 void WCoverArtLabel::loadTrack(TrackPointer pTrack) {
@@ -95,7 +85,7 @@ void WCoverArtLabel::loadTrack(TrackPointer pTrack) {
 }
 
 void WCoverArtLabel::mousePressEvent(QMouseEvent* event) {
-    if (m_pCoverMenu != nullptr && m_pCoverMenu->isVisible()) {
+    if (m_pWCoverArtMenu != nullptr && m_pWCoverArtMenu->isVisible()) {
         return;
     }
 
