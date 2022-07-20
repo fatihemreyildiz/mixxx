@@ -55,6 +55,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
             const QPixmap& pixmap,
             mixxx::cache_key_t requestedCacheKey,
             bool coverInfoUpdated);
+    void slotCoverInfoSelected(const CoverInfoRelative& coverInfo);
+    void slotReloadCoverArt();
 
   private:
     void loadCurrentTrackCover();
@@ -69,6 +71,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     TrackPointer m_track;
 
     QModelIndex m_currentTrackIndex;
+
+    WCoverArtMenu* m_pWCurrentCoverArtMenu;
 
     parented_ptr<WCoverArtLabel> m_pCurrentCoverArt;
     parented_ptr<WCoverArtLabel> m_pFetchedCoverArt;

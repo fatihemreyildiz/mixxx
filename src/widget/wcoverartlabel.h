@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QLabel>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QPixmap>
 #include <QWidget>
@@ -16,7 +17,7 @@ class CoverInfoRelative;
 class WCoverArtLabel : public QLabel {
     Q_OBJECT
   public:
-    explicit WCoverArtLabel(QWidget* parent = nullptr, WCoverArtMenu* m_pWCoverArtMenu = nullptr);
+    explicit WCoverArtLabel(QWidget* parent = nullptr, QMenu* m_pWCoverArtMenu = nullptr);
 
     ~WCoverArtLabel() override; // Verifies that the base destructor is virtual
 
@@ -31,7 +32,7 @@ class WCoverArtLabel : public QLabel {
       void slotCoverMenu(const QPoint& pos);
 
   private:
-    WCoverArtMenu* m_pWCoverArtMenu;
+    QMenu* m_pCoverArtMenu;
 
     const parented_ptr<DlgCoverArtFullSize> m_pDlgFullSize;
 

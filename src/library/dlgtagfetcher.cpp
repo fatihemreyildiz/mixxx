@@ -66,7 +66,8 @@ DlgTagFetcher::DlgTagFetcher(
         : QDialog(nullptr),
           m_pTrackModel(pTrackModel),
           m_tagFetcher(this),
-          m_pCurrentCoverArt(make_parented<WCoverArtLabel>(this, new WCoverArtMenu)),
+          m_pWCurrentCoverArtMenu(new WCoverArtMenu),
+          m_pCurrentCoverArt(make_parented<WCoverArtLabel>(this, m_pWCurrentCoverArtMenu)),
           m_pFetchedCoverArt(make_parented<WCoverArtLabel>(this)),
           m_networkResult(NetworkResult::Ok) {
     init();
@@ -108,6 +109,15 @@ void DlgTagFetcher::init() {
                 this,
                 &DlgTagFetcher::slotCoverFound);
     }
+    connect(m_pWCurrentCoverArtMenu,
+            &WCoverArtMenu::coverInfoSelected,
+            this,
+            &DlgTagFetcher::slotCoverInfoSelected);
+    connect(m_pWCurrentCoverArtMenu,
+            &WCoverArtMenu::reloadCoverArt,
+            this,
+            &DlgTagFetcher::slotReloadCoverArt);
+    updateStack();
 }
 
 void DlgTagFetcher::slotNext() {
@@ -252,6 +262,7 @@ void DlgTagFetcher::quit() {
 
 void DlgTagFetcher::loadCurrentTrackCover() {
     m_pCurrentCoverArt->loadTrack(m_track);
+    m_pFetchedCoverArt->loadTrack(m_track);
     CoverArtCache* pCache = CoverArtCache::instance();
     pCache->requestTrackCover(this, m_track);
 }
@@ -380,5 +391,24 @@ void DlgTagFetcher::slotCoverFound(
             m_track->getLocation() == coverInfo.trackLocation) {
         m_trackRecord.setCoverInfo(coverInfo);
         m_pCurrentCoverArt->setCoverArt(coverInfo, pixmap);
+        m_pFetchedCoverArt->setCoverArt(coverInfo, pixmap);
     }
+}
+
+void DlgTagFetcher::slotReloadCoverArt() {
+    VERIFY_OR_DEBUG_ASSERT(m_track) {
+        return;
+    }
+    slotCoverInfoSelected(
+            CoverInfoGuesser().guessCoverInfoForTrack(
+                    *m_track));
+}
+
+void DlgTagFetcher::slotCoverInfoSelected(const CoverInfoRelative& coverInfo) {
+    qDebug() << "DlgTagFetcher::slotCoverInfoSelected" << coverInfo;
+    VERIFY_OR_DEBUG_ASSERT(m_track) {
+        return;
+    }
+    m_trackRecord.setCoverInfo(coverInfo);
+    CoverArtCache::requestCover(this, CoverInfo(coverInfo, m_track->getLocation()));
 }
