@@ -17,10 +17,10 @@ constexpr int kAcoustIdTimeoutMillis = 60000; // msec
 constexpr int kMusicBrainzTimeoutMillis = 60000; // msec
 
 // Long timeout to cope with occasional server-side unresponsiveness
-constexpr int kCoverArtArchiveTimeoutMilis = 60000; // msec
+constexpr int kCoverArtArchiveLinksTimeoutMilis = 60000; // msec
 
 // Long timeout to cope with occasional server-side unresponsiveness
-constexpr int kCoverArtArchiveImageTimeoutMilis = 60000; // msec
+constexpr int kCoverArtArchiveThumbnailsTimeoutMilis = 60000; // msec
 
 } // anonymous namespace
 
@@ -62,13 +62,13 @@ void TagFetcher::cancel() {
         m_pMusicBrainzTask->invokeAbort();
         DEBUG_ASSERT(!m_pMusicBrainzTask);
     }
-    if (m_pCoverArtArchiveTask) {
-        m_pCoverArtArchiveTask->invokeAbort();
-        DEBUG_ASSERT(!m_pCoverArtArchiveTask);
+    if (m_pCoverArtArchiveLinksTask) {
+        m_pCoverArtArchiveLinksTask->invokeAbort();
+        DEBUG_ASSERT(!m_pCoverArtArchiveLinksTask);
     }
-    if (m_pCoverArtArchiveImageTask) {
-        m_pCoverArtArchiveImageTask->invokeAbort();
-        DEBUG_ASSERT(!m_pCoverArtArchiveImageTask);
+    if (m_pCoverArtArchiveThumbnailsTask) {
+        m_pCoverArtArchiveThumbnailsTask->invokeAbort();
+        DEBUG_ASSERT(!m_pCoverArtArchiveThumbnailsTask);
     }
 }
 
@@ -296,79 +296,79 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
         albumReleaseIds.append(guessedTrackRelease.albumReleaseId);
     }
 
-    m_pCoverArtArchiveTask = make_parented<mixxx::CoverArtArchiveTask>(
+    m_pCoverArtArchiveLinksTask = make_parented<mixxx::CoverArtArchiveLinksTask>(
             &m_network,
             std::move(albumReleaseIds),
             this);
 
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::succeeded,
+    connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::succeeded,
             this,
-            &TagFetcher::slotCoverArtArchiveTaskSucceeded);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::failed,
+            &TagFetcher::slotCoverArtArchiveLinksTaskSucceeded);
+    connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::failed,
             this,
-            &TagFetcher::slotCoverArtArchiveTaskFailed);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::aborted,
+            &TagFetcher::slotCoverArtArchiveLinksTaskFailed);
+    connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::aborted,
             this,
-            &TagFetcher::slotCoverArtArchiveTaskAborted);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::networkError,
+            &TagFetcher::slotCoverArtArchiveLinksTaskAborted);
+    connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::networkError,
             this,
-            &TagFetcher::slotCoverArtArchiveTaskNetworkError);
-    connect(m_pCoverArtArchiveTask,
-            &mixxx::CoverArtArchiveTask::notFound,
+            &TagFetcher::slotCoverArtArchiveLinksTaskNetworkError);
+    connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::notFound,
             this,
-            &TagFetcher::slotCoverArtArchiveTaskNotFound);
+            &TagFetcher::slotCoverArtArchiveLinksTaskNotFound);
 
-    m_pCoverArtArchiveTask->invokeStart(
-            kCoverArtArchiveTimeoutMilis);
+    m_pCoverArtArchiveLinksTask->invokeStart(
+            kCoverArtArchiveLinksTimeoutMilis);
 
     emit resultAvailable(
             std::move(pTrack),
             std::move(guessedTrackReleases));
 }
 
-bool TagFetcher::onCoverArtArchiveTaskTerminated() {
+bool TagFetcher::onCoverArtArchiveLinksTaskTerminated() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    auto* const pCoverArtArchiveTask = m_pCoverArtArchiveTask.get();
+    auto* const pCoverArtArchiveLinksTask = m_pCoverArtArchiveLinksTask.get();
     DEBUG_ASSERT(sender());
-    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveTask ==
-            qobject_cast<mixxx::CoverArtArchiveTask*>(sender())) {
+    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveLinksTask ==
+            qobject_cast<mixxx::CoverArtArchiveLinksTask*>(sender())) {
         return false;
     }
-    m_pCoverArtArchiveTask = nullptr;
-    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveTask);
-    pCoverArtArchiveTask->disconnect(this);
+    m_pCoverArtArchiveLinksTask = nullptr;
+    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveLinksTask);
+    pCoverArtArchiveLinksTask->disconnect(this);
     return true;
 }
 
-void TagFetcher::slotCoverArtArchiveTaskAborted() {
+void TagFetcher::slotCoverArtArchiveLinksTaskAborted() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveTaskTerminated()) {
+    if (!onCoverArtArchiveLinksTaskTerminated()) {
         return;
     }
 
     cancel();
 }
 
-void TagFetcher::slotCoverArtArchiveTaskNotFound() {
+void TagFetcher::slotCoverArtArchiveLinksTaskNotFound() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveTaskTerminated()) {
+    if (!onCoverArtArchiveLinksTaskTerminated()) {
         return;
     }
     qDebug() << "No image found on Cover Art Archive";
     cancel();
 }
 
-void TagFetcher::slotCoverArtArchiveTaskNetworkError(
+void TagFetcher::slotCoverArtArchiveLinksTaskNetworkError(
         QNetworkReply::NetworkError errorCode,
         const QString& errorString,
         const mixxx::network::WebResponseWithContent& responseWithContent) {
     Q_UNUSED(responseWithContent);
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveTaskTerminated()) {
+    if (!onCoverArtArchiveLinksTaskTerminated()) {
         return;
     }
 
@@ -381,10 +381,10 @@ void TagFetcher::slotCoverArtArchiveTaskNetworkError(
             errorCode);
 }
 
-void TagFetcher::slotCoverArtArchiveTaskFailed(
+void TagFetcher::slotCoverArtArchiveLinksTaskFailed(
         const mixxx::network::JsonWebResponse& response) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveTaskTerminated()) {
+    if (!onCoverArtArchiveLinksTaskTerminated()) {
         return;
     }
 
@@ -397,55 +397,55 @@ void TagFetcher::slotCoverArtArchiveTaskFailed(
             -1);
 }
 
-void TagFetcher::slotCoverArtArchiveTaskSucceeded(
+void TagFetcher::slotCoverArtArchiveLinksTaskSucceeded(
         const QMap<QUuid, QString>& coverArtThumbnailUrls) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveTaskTerminated()) {
+    if (!onCoverArtArchiveLinksTaskTerminated()) {
         return;
     }
 
     auto pTrack = std::move(m_pTrack);
     cancel();
 
-    m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
+    m_pCoverArtArchiveThumbnailsTask = make_parented<mixxx::CoverArtArchiveThumbnailsTask>(
             &m_network,
             std::move(coverArtThumbnailUrls),
             this);
 
-    connect(m_pCoverArtArchiveImageTask,
-            &mixxx::CoverArtArchiveImageTask::succeeded,
+    connect(m_pCoverArtArchiveThumbnailsTask,
+            &mixxx::CoverArtArchiveThumbnailsTask::succeeded,
             this,
-            &TagFetcher::slotCoverArtArchiveImageTaskSucceeded);
-    connect(m_pCoverArtArchiveImageTask,
-            &mixxx::CoverArtArchiveImageTask::failed,
+            &TagFetcher::slotCoverArtArchiveThumbnailsTaskSucceeded);
+    connect(m_pCoverArtArchiveThumbnailsTask,
+            &mixxx::CoverArtArchiveThumbnailsTask::failed,
             this,
-            &TagFetcher::slotCoverArtArchiveImageTaskFailed);
-    connect(m_pCoverArtArchiveImageTask,
-            &mixxx::CoverArtArchiveImageTask::aborted,
+            &TagFetcher::slotCoverArtArchiveThumbnailsTaskFailed);
+    connect(m_pCoverArtArchiveThumbnailsTask,
+            &mixxx::CoverArtArchiveThumbnailsTask::aborted,
             this,
-            &TagFetcher::slotCoverArtArchiveImageTaskAborted);
-    connect(m_pCoverArtArchiveImageTask,
-            &mixxx::CoverArtArchiveImageTask::networkError,
+            &TagFetcher::slotCoverArtArchiveThumbnailsTaskAborted);
+    connect(m_pCoverArtArchiveThumbnailsTask,
+            &mixxx::CoverArtArchiveThumbnailsTask::networkError,
             this,
-            &TagFetcher::slotCoverArtArchiveImageTaskNetworkError);
+            &TagFetcher::slotCoverArtArchiveThumbnailsTaskNetworkError);
 
-    m_pCoverArtArchiveImageTask->invokeStart(
-            kCoverArtArchiveImageTimeoutMilis);
+    m_pCoverArtArchiveThumbnailsTask->invokeStart(
+            kCoverArtArchiveThumbnailsTimeoutMilis);
 }
 
-void TagFetcher::slotCoverArtArchiveImageTaskAborted() {
+void TagFetcher::slotCoverArtArchiveThumbnailsTaskAborted() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveImageTaskTerminated()) {
+    if (!onCoverArtArchiveThumbnailsTaskTerminated()) {
         return;
     }
 
     cancel();
 }
 
-void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(
+void TagFetcher::slotCoverArtArchiveThumbnailsTaskSucceeded(
         const QMap<QUuid, QByteArray>& smallThumbnailsBytes) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveImageTaskTerminated()) {
+    if (!onCoverArtArchiveThumbnailsTaskTerminated()) {
         return;
     }
     emit coverArtThumbnailFetchAvailable(smallThumbnailsBytes);
@@ -453,26 +453,26 @@ void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(
     auto pTrack = std::move(m_pTrack);
 }
 
-bool TagFetcher::onCoverArtArchiveImageTaskTerminated() {
+bool TagFetcher::onCoverArtArchiveThumbnailsTaskTerminated() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    auto* const pCoverArtArchiveImageTask = m_pCoverArtArchiveImageTask.get();
+    auto* const pCoverArtArchiveThumbnailsTask = m_pCoverArtArchiveThumbnailsTask.get();
     DEBUG_ASSERT(sender());
-    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveImageTask ==
-            qobject_cast<mixxx::CoverArtArchiveImageTask*>(sender())) {
+    VERIFY_OR_DEBUG_ASSERT(pCoverArtArchiveThumbnailsTask ==
+            qobject_cast<mixxx::CoverArtArchiveThumbnailsTask*>(sender())) {
         return false;
     }
-    m_pCoverArtArchiveImageTask = nullptr;
-    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveImageTask);
-    pCoverArtArchiveImageTask->disconnect(this);
+    m_pCoverArtArchiveThumbnailsTask = nullptr;
+    const auto taskDeleter = mixxx::ScopedDeleteLater(pCoverArtArchiveThumbnailsTask);
+    pCoverArtArchiveThumbnailsTask->disconnect(this);
     return true;
 }
 
-void TagFetcher::slotCoverArtArchiveImageTaskFailed(
+void TagFetcher::slotCoverArtArchiveThumbnailsTaskFailed(
         const mixxx::network::WebResponse& response,
         int errorCode,
         const QString& errorMessage) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveImageTaskTerminated()) {
+    if (!onCoverArtArchiveThumbnailsTaskTerminated()) {
         return;
     }
 
@@ -485,13 +485,13 @@ void TagFetcher::slotCoverArtArchiveImageTaskFailed(
             errorCode);
 }
 
-void TagFetcher::slotCoverArtArchiveImageTaskNetworkError(
+void TagFetcher::slotCoverArtArchiveThumbnailsTaskNetworkError(
         QNetworkReply::NetworkError errorCode,
         const QString& errorString,
         const mixxx::network::WebResponseWithContent& responseWithContent) {
     Q_UNUSED(responseWithContent);
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (!onCoverArtArchiveImageTaskTerminated()) {
+    if (!onCoverArtArchiveThumbnailsTaskTerminated()) {
         return;
     }
 

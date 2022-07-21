@@ -1,4 +1,4 @@
-#include "musicbrainz/web/coverartarchivetask.h"
+#include "musicbrainz/web/coverartarchivelinkstask.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -13,7 +13,7 @@ namespace mixxx {
 
 namespace {
 
-const Logger kLogger("CoverArtArchiveTask");
+const Logger kLogger("CoverArtArchiveLinksTask");
 
 const QUrl kBaseUrl = QStringLiteral("https://coverartarchive.org/");
 
@@ -40,7 +40,7 @@ QNetworkRequest createNetworkRequest(
 
 } // anonymous namespace
 
-CoverArtArchiveTask::CoverArtArchiveTask(
+CoverArtArchiveLinksTask::CoverArtArchiveLinksTask(
         QNetworkAccessManager* networkAccessManager,
         QList<QUuid>&& albumReleaseIds,
         QObject* parent)
@@ -53,7 +53,7 @@ CoverArtArchiveTask::CoverArtArchiveTask(
           m_parentTimeoutMillis(0) {
 }
 
-QNetworkReply* CoverArtArchiveTask::sendNetworkRequest(
+QNetworkReply* CoverArtArchiveLinksTask::sendNetworkRequest(
         QNetworkAccessManager* networkAccessManager,
         network::HttpRequestMethod method,
         int parentTimeoutMillis,
@@ -82,7 +82,7 @@ QNetworkReply* CoverArtArchiveTask::sendNetworkRequest(
     return networkAccessManager->get(networkRequest);
 }
 
-void CoverArtArchiveTask::onFinished(
+void CoverArtArchiveLinksTask::onFinished(
         const network::JsonWebResponse& response) {
     //This is added only for to get Url of the images
     //I tried few ways, they didn't work at all
@@ -160,10 +160,10 @@ void CoverArtArchiveTask::onFinished(
     slotStart(m_parentTimeoutMillis);
 }
 
-void CoverArtArchiveTask::emitSucceeded(
+void CoverArtArchiveLinksTask::emitSucceeded(
         const QMap<QUuid, QString>& coverArtThumbnailUrls) {
     VERIFY_OR_DEBUG_ASSERT(
-            isSignalFuncConnected(&CoverArtArchiveTask::succeeded)) {
+            isSignalFuncConnected(&CoverArtArchiveLinksTask::succeeded)) {
         kLogger.warning()
                 << "Unhandled succeeded signal";
         deleteLater();

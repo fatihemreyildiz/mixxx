@@ -1,4 +1,4 @@
-#include "musicbrainz/web/coverartarchiveimagetask.h"
+#include "musicbrainz/web/coverartarchivethumbnailstask.h"
 
 #include <QMetaMethod>
 
@@ -13,7 +13,7 @@ namespace mixxx {
 
 namespace {
 
-const Logger kLogger("CoverArtArchiveImageTask");
+const Logger kLogger("CoverArtArchiveThumbnailsTask");
 
 QNetworkRequest createNetworkRequest(const QString& smallThumbnailUrl) {
     QUrl url = smallThumbnailUrl;
@@ -24,7 +24,7 @@ QNetworkRequest createNetworkRequest(const QString& smallThumbnailUrl) {
 
 } // anonymous namespace
 
-CoverArtArchiveImageTask::CoverArtArchiveImageTask(
+CoverArtArchiveThumbnailsTask::CoverArtArchiveThumbnailsTask(
         QNetworkAccessManager* networkAccessManager,
         const QMap<QUuid, QString>& smallThumbnailsUrls,
         QObject* parent)
@@ -35,7 +35,7 @@ CoverArtArchiveImageTask::CoverArtArchiveImageTask(
           m_parentTimeoutMillis(0) {
 }
 
-QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
+QNetworkReply* CoverArtArchiveThumbnailsTask::doStartNetworkRequest(
         QNetworkAccessManager* networkAccessManager,
         int parentTimeoutMillis) {
     networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
@@ -62,7 +62,7 @@ QNetworkReply* CoverArtArchiveImageTask::doStartNetworkRequest(
     return networkAccessManager->get(networkRequest);
 }
 
-void CoverArtArchiveImageTask::doNetworkReplyFinished(
+void CoverArtArchiveThumbnailsTask::doNetworkReplyFinished(
         QNetworkReply* finishedNetworkReply,
         network::HttpStatusCode statusCode) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
@@ -81,15 +81,16 @@ void CoverArtArchiveImageTask::doNetworkReplyFinished(
     m_queuedSmallThumbnailUrls.erase(m_queuedSmallThumbnailUrls.begin());
     if (m_queuedSmallThumbnailUrls.isEmpty()) {
         qDebug() << m_smallThumbnailBytes.size() << " Cover arts found.";
-        succeeded(m_smallThumbnailBytes);
+        emit succeeded(m_smallThumbnailBytes);
         return;
     }
     slotStart(m_parentTimeoutMillis);
 }
 
-void CoverArtArchiveImageTask::emitSuceeded(const QMap<QUuid, QByteArray>& m_smallThumbnailBytes) {
+void CoverArtArchiveThumbnailsTask::emitSuceeded(
+        const QMap<QUuid, QByteArray>& m_smallThumbnailBytes) {
     VERIFY_OR_DEBUG_ASSERT(
-            isSignalFuncConnected(&CoverArtArchiveImageTask::succeeded)) {
+            isSignalFuncConnected(&CoverArtArchiveThumbnailsTask::succeeded)) {
         kLogger.warning()
                 << "Unhandled succeeded signal";
         deleteLater();
@@ -98,12 +99,12 @@ void CoverArtArchiveImageTask::emitSuceeded(const QMap<QUuid, QByteArray>& m_sma
     emit succeeded(m_smallThumbnailBytes);
 }
 
-void CoverArtArchiveImageTask::emitFailed(
+void CoverArtArchiveThumbnailsTask::emitFailed(
         const network::WebResponse& response,
         int errorCode,
         const QString& errorMessage) {
     VERIFY_OR_DEBUG_ASSERT(
-            isSignalFuncConnected(&CoverArtArchiveImageTask::failed)) {
+            isSignalFuncConnected(&CoverArtArchiveThumbnailsTask::failed)) {
         kLogger.warning()
                 << "Unhandled failed signal"
                 << response

@@ -8,15 +8,15 @@
 
 namespace mixxx {
 
-class CoverArtArchiveImageTask : public network::WebTask {
+class CoverArtArchiveThumbnailsTask : public network::WebTask {
     Q_OBJECT
 
   public:
-    CoverArtArchiveImageTask(
+    CoverArtArchiveThumbnailsTask(
             QNetworkAccessManager* networkAccessManager,
             const QMap<QUuid, QString>& smallThumbnailsUrls,
             QObject* parent = nullptr);
-    ~CoverArtArchiveImageTask() override = default;
+    ~CoverArtArchiveThumbnailsTask() override = default;
 
   signals:
     void succeeded(

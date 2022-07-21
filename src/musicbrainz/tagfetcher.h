@@ -4,8 +4,8 @@
 #include <QObject>
 
 #include "musicbrainz/web/acoustidlookuptask.h"
-#include "musicbrainz/web/coverartarchiveimagetask.h"
-#include "musicbrainz/web/coverartarchivetask.h"
+#include "musicbrainz/web/coverartarchivelinkstask.h"
+#include "musicbrainz/web/coverartarchivethumbnailstask.h"
 #include "musicbrainz/web/musicbrainzrecordingstask.h"
 #include "track/track_decl.h"
 #include "util/parented_ptr.h"
@@ -68,23 +68,24 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
 
-    void slotCoverArtArchiveTaskSucceeded(const QMap<QUuid, QString>& coverArtThumbnailUrls);
-    void slotCoverArtArchiveTaskFailed(
+    void slotCoverArtArchiveLinksTaskSucceeded(const QMap<QUuid, QString>& coverArtThumbnailUrls);
+    void slotCoverArtArchiveLinksTaskFailed(
             const mixxx::network::JsonWebResponse& response);
-    void slotCoverArtArchiveTaskAborted();
-    void slotCoverArtArchiveTaskNetworkError(
+    void slotCoverArtArchiveLinksTaskAborted();
+    void slotCoverArtArchiveLinksTaskNetworkError(
             QNetworkReply::NetworkError errorCode,
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
-    void slotCoverArtArchiveTaskNotFound();
+    void slotCoverArtArchiveLinksTaskNotFound();
 
-    void slotCoverArtArchiveImageTaskSucceeded(const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
-    void slotCoverArtArchiveImageTaskFailed(
+    void slotCoverArtArchiveThumbnailsTaskSucceeded(
+            const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
+    void slotCoverArtArchiveThumbnailsTaskFailed(
             const mixxx::network::WebResponse& response,
             int errorCode,
             const QString& errorMessage);
-    void slotCoverArtArchiveImageTaskAborted();
-    void slotCoverArtArchiveImageTaskNetworkError(
+    void slotCoverArtArchiveThumbnailsTaskAborted();
+    void slotCoverArtArchiveThumbnailsTaskNetworkError(
             QNetworkReply::NetworkError errorCode,
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
@@ -92,8 +93,8 @@ class TagFetcher : public QObject {
   private:
     bool onAcoustIdTaskTerminated();
     bool onMusicBrainzTaskTerminated();
-    bool onCoverArtArchiveTaskTerminated();
-    bool onCoverArtArchiveImageTaskTerminated();
+    bool onCoverArtArchiveLinksTaskTerminated();
+    bool onCoverArtArchiveThumbnailsTaskTerminated();
 
     QNetworkAccessManager m_network;
 
@@ -103,9 +104,9 @@ class TagFetcher : public QObject {
 
     parented_ptr<mixxx::MusicBrainzRecordingsTask> m_pMusicBrainzTask;
 
-    parented_ptr<mixxx::CoverArtArchiveTask> m_pCoverArtArchiveTask;
+    parented_ptr<mixxx::CoverArtArchiveLinksTask> m_pCoverArtArchiveLinksTask;
 
-    parented_ptr<mixxx::CoverArtArchiveImageTask> m_pCoverArtArchiveImageTask;
+    parented_ptr<mixxx::CoverArtArchiveThumbnailsTask> m_pCoverArtArchiveThumbnailsTask;
 
     TrackPointer m_pTrack;
 };

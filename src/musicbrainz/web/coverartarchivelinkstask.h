@@ -9,16 +9,16 @@
 
 namespace mixxx {
 
-class CoverArtArchiveTask : public network::JsonWebTask {
+class CoverArtArchiveLinksTask : public network::JsonWebTask {
     Q_OBJECT
 
   public:
-    CoverArtArchiveTask(
+    CoverArtArchiveLinksTask(
             QNetworkAccessManager* networkAccessManager,
             QList<QUuid>&& albumReleaseIds,
             QObject* parent = nullptr);
 
-    ~CoverArtArchiveTask() override = default;
+    ~CoverArtArchiveLinksTask() override = default;
 
   signals:
     void succeeded(
