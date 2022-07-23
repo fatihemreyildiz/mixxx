@@ -6,7 +6,9 @@
 #include "defs_urls.h"
 #include "library/coverartcache.h"
 #include "library/coverartutils.h"
+#include "library/library_prefs.h"
 #include "moc_dlgtagfetcher.cpp"
+#include "preferences/dialog/dlgpreflibrary.h"
 #include "track/track.h"
 #include "track/tracknumbers.h"
 
@@ -58,11 +60,11 @@ void addTrack(
 
 } // anonymous namespace
 
-DlgTagFetcher::DlgTagFetcher(
-        const TrackModel* pTrackModel)
+DlgTagFetcher::DlgTagFetcher(UserSettingsPointer pConfig, const TrackModel* pTrackModel)
         // No parent because otherwise it inherits the style parent's
         // style which can make it unreadable. Bug #673411
         : QDialog(nullptr),
+          m_pConfig(pConfig),
           m_pTrackModel(pTrackModel),
           m_tagFetcher(this),
           m_pCurrentCoverArt(make_parented<CoverArtLabel>(this)),
@@ -104,6 +106,15 @@ void DlgTagFetcher::init() {
     connect(&m_tagFetcher, &TagFetcher::resultAvailable, this, &DlgTagFetcher::fetchTagFinished);
     connect(&m_tagFetcher, &TagFetcher::fetchProgress, this, &DlgTagFetcher::fetchTagProgress);
     connect(&m_tagFetcher, &TagFetcher::networkError, this, &DlgTagFetcher::slotNetworkResult);
+
+    connect(&m_tagFetcher,
+            &TagFetcher::coverArtUrlsAvailable,
+            this,
+            &DlgTagFetcher::fetchCoverArtUrlFinished);
+    connect(&m_tagFetcher,
+            &TagFetcher::coverArtImageFetchAvailable,
+            this,
+            &DlgTagFetcher::downloadCoverAndApply);
 
     connect(&m_tagFetcher,
             &TagFetcher::coverArtThumbnailFetchAvailable,
@@ -440,11 +451,33 @@ void DlgTagFetcher::fetchCoverArt() {
     if (resultIndex < 0) {
         return;
     }
+
+    int fetchedCoverArtQualityConfigValue =
+            m_pConfig->getValue(mixxx::library::prefs::kCoverArtFetcherQualityConfigKey,
+                    static_cast<int>(DlgPrefLibrary::CoverArtFetcherQuality::Lowest));
+    DlgPrefLibrary::CoverArtFetcherQuality fetcherQuality =
+            static_cast<DlgPrefLibrary::CoverArtFetcherQuality>(
+                    fetchedCoverArtQualityConfigValue);
+
     const mixxx::musicbrainz::TrackRelease& trackRelease = m_data.m_results[resultIndex];
-    if (m_resultsThumbnails.contains(trackRelease.albumReleaseId)) {
-        downloadCoverAndApply(m_resultsThumbnails.value(trackRelease.albumReleaseId));
-    } else
-        return;
+    if (m_resultsCoverArtAllUrls.contains(trackRelease.albumReleaseId)) {
+        const QList listOfAllCoverArtUrls =
+                m_resultsCoverArtAllUrls.value(trackRelease.albumReleaseId);
+        if (fetcherQuality == DlgPrefLibrary::CoverArtFetcherQuality::Lowest) {
+            getCoverArt(listOfAllCoverArtUrls.last());
+            return;
+        } else if (fetcherQuality == DlgPrefLibrary::CoverArtFetcherQuality::Medium) {
+            if (listOfAllCoverArtUrls.size() < 3) {
+                getCoverArt(listOfAllCoverArtUrls.first());
+            } else {
+                getCoverArt(listOfAllCoverArtUrls.at(1));
+            }
+            return;
+        } else if (fetcherQuality == DlgPrefLibrary::CoverArtFetcherQuality::Highest) {
+            getCoverArt(listOfAllCoverArtUrls.first());
+            return;
+        }
+    }
 }
 
 void DlgTagFetcher::downloadCoverAndApply(const QByteArray& data) {
@@ -467,6 +500,15 @@ void DlgTagFetcher::downloadCoverAndApply(const QByteArray& data) {
     coverInfo.setImage(updatedCoverArtFound);
     m_pCurrentCoverArt->setCoverArt(CoverInfo{}, QPixmap::fromImage(updatedCoverArtFound));
     m_track->setCoverInfo(coverInfo);
+}
+
+void DlgTagFetcher::getCoverArt(const QString& url) {
+    m_tagFetcher.fetchDesiredResolutionCoverArt(url);
+}
+
+void DlgTagFetcher::fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls) {
+    m_resultsCoverArtAllUrls = coverArtAllUrls;
+    updateStack();
 }
 
 void DlgTagFetcher::fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes) {

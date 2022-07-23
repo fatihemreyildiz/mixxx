@@ -93,7 +93,7 @@ void CoverArtArchiveLinksTask::onFinished(
         m_queuedAlbumReleaseIds.removeFirst();
         if (m_queuedAlbumReleaseIds.isEmpty()) {
             qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
-            // emit all links.
+            emit succeededLinks(m_coverArtUrls);
             emitSucceeded(m_smallThumbnailUrls);
             return;
         }
@@ -130,28 +130,39 @@ void CoverArtArchiveLinksTask::onFinished(
         emitFailed(response);
         return;
     }
-
+    QList<QString> allUrls;
     DEBUG_ASSERT(jsonObject.value(QLatin1String("images")).isArray());
     const QJsonArray images = jsonObject.value(QLatin1String("images")).toArray();
     for (const auto& image : images) {
         DEBUG_ASSERT(image.isObject());
         const auto imageObject = image.toObject();
+        if (!(imageObject.value(QLatin1String("image")).isNull())) {
+            const auto highestResolutionImageUrl =
+                    imageObject.value(QLatin1String("image")).toString();
+            allUrls.append(highestResolutionImageUrl);
+        }
         const auto thumbnails = imageObject.value(QLatin1String("thumbnails")).toObject();
         DEBUG_ASSERT(!thumbnails.isEmpty());
+
+        if (thumbnails.value(QLatin1String("1200")).toString() != nullptr) {
+            const auto largestThumbnailUrl = thumbnails.value(QLatin1String("1200")).toString();
+            allUrls.append(largestThumbnailUrl);
+        }
+
         const auto smallThumbnailUrl = thumbnails.value(QLatin1String("small")).toString();
         DEBUG_ASSERT(!smallThumbnailUrl.isNull());
         const auto largeThumbnailUrl = thumbnails.value(QLatin1String("large")).toString();
         DEBUG_ASSERT(!largeThumbnailUrl.isNull());
         m_smallThumbnailUrls.insert(m_queuedAlbumReleaseIds.first(), smallThumbnailUrl);
-        //m_allThumbnailUrls.append(largeThumbnailUrl);
-        //m_allThumbnailUrls.append(smallThumbnailUrl);
-        //m_coverArtUrls.insert(m_queuedAlbumReleaseIds.first(), m_allThumbnailUrls);
+        allUrls.append(largeThumbnailUrl);
+        allUrls.append(smallThumbnailUrl);
+        m_coverArtUrls.insert(m_queuedAlbumReleaseIds.first(), allUrls);
         break;
     }
     m_queuedAlbumReleaseIds.removeFirst();
     if (m_queuedAlbumReleaseIds.isEmpty()) {
         qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
-        //TODO: Emit all links
+        emit succeededLinks(m_coverArtUrls);
         emitSucceeded(m_smallThumbnailUrls);
         return;
     }

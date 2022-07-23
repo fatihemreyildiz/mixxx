@@ -2026,7 +2026,7 @@ void WTrackMenu::slotShowDlgTrackInfo() {
     }
     // Create a fresh dialog on invocation
     m_pDlgTrackInfo = std::make_unique<DlgTrackInfo>(
-            m_pTrackModel);
+            m_pConfig, m_pTrackModel);
     connect(m_pDlgTrackInfo.get(),
             &QDialog::finished,
             this,
@@ -2050,7 +2050,7 @@ void WTrackMenu::slotShowDlgTagFetcher() {
     }
     // Create a fresh dialog on invocation
     m_pDlgTagFetcher = std::make_unique<DlgTagFetcher>(
-            m_pTrackModel);
+            m_pConfig, m_pTrackModel);
     connect(m_pDlgTagFetcher.get(),
             &QDialog::finished,
             this,

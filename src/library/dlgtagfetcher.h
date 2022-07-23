@@ -24,7 +24,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
   public:
     // TODO: Remove dependency on TrackModel
     explicit DlgTagFetcher(
-            const TrackModel* pTrackModel = nullptr);
+            UserSettingsPointer pConfig, const TrackModel* pTrackModel = nullptr);
     ~DlgTagFetcher() override = default;
 
     void init();
@@ -41,6 +41,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void fetchTagFinished(
             TrackPointer pTrack,
             const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
+    void fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls);
     void fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes);
     void resultSelected();
     void fetchTagProgress(const QString&);
@@ -65,6 +66,9 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void loadTrackInternal(const TrackPointer& track);
     void updateStack();
     void addDivider(const QString& text, QTreeWidget* parent) const;
+    void getCoverArt(const QString& url);
+
+    UserSettingsPointer m_pConfig;
 
     const TrackModel* const m_pTrackModel;
 
@@ -80,6 +84,8 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     mixxx::TrackRecord m_trackRecord;
 
     QMap<QUuid, QByteArray> m_resultsThumbnails;
+
+    QMap<QUuid, QList<QString>> m_resultsCoverArtAllUrls;
 
     struct Data {
         Data()

@@ -27,7 +27,7 @@ class DlgTrackInfo : public QDialog, public Ui::DlgTrackInfo {
   public:
     // TODO: Remove dependency on TrackModel
     explicit DlgTrackInfo(
-            const TrackModel* trackModel = nullptr);
+            UserSettingsPointer pConfig, const TrackModel* trackModel = nullptr);
     ~DlgTrackInfo() override = default;
 
   public slots:
@@ -99,6 +99,8 @@ class DlgTrackInfo : public QDialog, public Ui::DlgTrackInfo {
 
     void updateTrackMetadataFields();
     void updateSpinBpmFromBeats();
+
+    UserSettingsPointer m_pConfig;
 
     const TrackModel* const m_pTrackModel;
 

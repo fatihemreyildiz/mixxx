@@ -22,6 +22,9 @@ constexpr int kCoverArtArchiveLinksTimeoutMilis = 60000; // msec
 // Long timeout to cope with occasional server-side unresponsiveness
 constexpr int kCoverArtArchiveThumbnailsTimeoutMilis = 60000; // msec
 
+// Long timeout to cope with occasional server-side unresponsiveness
+constexpr int kCoverArtArchiveImageTimeoutMilis = 60000; // msec
+
 } // anonymous namespace
 
 TagFetcher::TagFetcher(QObject* parent)
@@ -306,6 +309,10 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
             this,
             &TagFetcher::slotCoverArtArchiveLinksTaskSucceeded);
     connect(m_pCoverArtArchiveLinksTask,
+            &mixxx::CoverArtArchiveLinksTask::succeededLinks,
+            this,
+            &TagFetcher::slotCoverArtArchiveLinksTaskSucceededLinks);
+    connect(m_pCoverArtArchiveLinksTask,
             &mixxx::CoverArtArchiveLinksTask::failed,
             this,
             &TagFetcher::slotCoverArtArchiveLinksTaskFailed);
@@ -502,4 +509,29 @@ void TagFetcher::slotCoverArtArchiveThumbnailsTaskNetworkError(
             QStringLiteral("CoverArtArchive"),
             errorString,
             errorCode);
+}
+
+void TagFetcher::slotCoverArtArchiveLinksTaskSucceededLinks(
+        const QMap<QUuid, QList<QString>>& allCoverArtUrls) {
+    emit coverArtUrlsAvailable(allCoverArtUrls);
+}
+
+void TagFetcher::fetchDesiredResolutionCoverArt(
+        const QString& coverArtUrl) {
+    m_pCoverArtArchiveImageTask = make_parented<mixxx::CoverArtArchiveImageTask>(
+            &m_network,
+            coverArtUrl,
+            this);
+
+    connect(m_pCoverArtArchiveImageTask,
+            &mixxx::CoverArtArchiveImageTask::succeeded,
+            this,
+            &TagFetcher::slotCoverArtArchiveImageTaskSucceeded);
+
+    m_pCoverArtArchiveImageTask->invokeStart(
+            kCoverArtArchiveImageTimeoutMilis);
+}
+
+void TagFetcher::slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverArtBytes) {
+    emit coverArtImageFetchAvailable(coverArtBytes);
 }

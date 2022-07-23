@@ -24,6 +24,9 @@ class CoverArtArchiveLinksTask : public network::JsonWebTask {
     void succeeded(
             const QMap<QUuid, QString>& smallThumbnailUrls);
 
+    void succeededLinks(
+            const QMap<QUuid, QList<QString>>& coverArtAllUrls);
+
     void failed(
             const mixxx::network::JsonWebResponse& response);
 
@@ -41,16 +44,13 @@ class CoverArtArchiveLinksTask : public network::JsonWebTask {
     void emitSucceeded(
             const QMap<QUuid, QString>& smallThumbnailUrls);
 
-    void emitAllUrls();
-
     QList<QUuid> m_queuedAlbumReleaseIds;
 
     QList<QString> m_allThumbnailUrls;
 
     QMap<QUuid, QString> m_smallThumbnailUrls;
 
-    QMap<QUuid, QList<QString>> m_coverArtUrls; // This can be used later on when
-                                                // preferences implementation.
+    QMap<QUuid, QList<QString>> m_coverArtUrls;
 
     int m_parentTimeoutMillis;
 };
