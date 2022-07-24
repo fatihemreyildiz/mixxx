@@ -21,106 +21,23 @@
      </property>
      <widget class="QWidget" name="results_page">
       <layout class="QGridLayout" name="verticalLayout_2">
-       <item row="1" column="1" rowspan="4" colspan="2">
-        <layout class="QVBoxLayout" name="verticalLayout_8">
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLabel { font-weight: bold; }</string>
-           </property>
-           <property name="text">
-            <string>Current Cover Art</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="currentCover" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>250</horstretch>
-             <verstretch>250</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QVBoxLayout" name="currentCoverArtLayout">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="sizeConstraint">
-             <enum>QLayout::SetDefaultConstraint</enum>
-            </property>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLabel { font-weight: bold; }</string>
-           </property>
-           <property name="text">
-            <string>Found Cover Art</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="fetchedCover" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>250</horstretch>
-             <verstretch>250</verstretch>
-            </sizepolicy>
-           </property>
-           <layout class="QVBoxLayout" name="fetchedCoverArtLayout">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="sizeConstraint">
-             <enum>QLayout::SetDefaultConstraint</enum>
-            </property>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        <item>
-          <widget class="QLabel" name="coverArtStatus">
-           <property name="text">
-            <string notr="true">Status: Fetching</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnCover">
-           <property name="text">
-            <string>&amp;Apply Cover Art</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel { font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>Select best possible match</string>
+         </property>
+        </widget>
        </item>
-       <item row="1" column="0" rowspan="4">
+       <item row="1" column="0" rowspan="2">
         <widget class="QTreeWidget" name="results">
          <property name="editTriggers">
           <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
@@ -167,22 +84,6 @@
            <string>Album Artist</string>
           </property>
          </column>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="3">
-        <widget class="QLabel" name="label_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QLabel { font-weight: bold; }</string>
-         </property>
-         <property name="text">
-          <string>Select best possible match</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -544,6 +445,173 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="coverFetcher_page">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="3" rowspan="3">
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel { font-weight: bold; }</string>
+           </property>
+           <property name="text">
+            <string>Current Cover Art</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="currentCover" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>250</horstretch>
+             <verstretch>250</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QVBoxLayout" name="currentCoverArtLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>429</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel { font-weight: bold; }</string>
+           </property>
+           <property name="text">
+            <string>Found Cover Art</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="fetchedCover" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>250</horstretch>
+             <verstretch>250</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QVBoxLayout" name="fetchedCoverArtLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_10">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="coverArtStatus">
+           <property name="text">
+            <string>Cover Arts Found</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="2">
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel { font-weight: bold; }</string>
+           </property>
+           <property name="text">
+            <string>Select best possible match</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="coverArtResults">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+           </property>
+           <property name="rootIsDecorated">
+            <bool>false</bool>
+           </property>
+           <attribute name="headerMinimumSectionSize">
+            <number>50</number>
+           </attribute>
+           <attribute name="headerDefaultSectionSize">
+            <number>150</number>
+           </attribute>
+           <attribute name="headerStretchLastSection">
+            <bool>true</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Title</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Artist</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Album</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Year</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="submit_page">
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -675,6 +743,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCover">
+       <property name="text">
+        <string>Look For CoverArts</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnApply">

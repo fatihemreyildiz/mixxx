@@ -44,6 +44,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls);
     void fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes);
     void resultSelected();
+    void coverArtResultSelected();
     void fetchTagProgress(const QString&);
     void slotNetworkResult(int httpStatus, const QString& app, const QString& message, int code);
     void slotTrackChanged(TrackId trackId);
@@ -63,8 +64,10 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
 
   private:
     void loadCurrentTrackCover();
+    void switchToCoverArtFetcher();
     void loadTrackInternal(const TrackPointer& track);
     void updateStack();
+    void updateCoverFetcher();
     void addDivider(const QString& text, QTreeWidget* parent) const;
     void getCoverArt(const QString& url);
 

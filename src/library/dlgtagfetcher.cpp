@@ -97,8 +97,7 @@ void DlgTagFetcher::init() {
     connect(btnCover,
             &QPushButton::clicked,
             this,
-            &DlgTagFetcher::
-                    fetchCoverArt);
+            &DlgTagFetcher::switchToCoverArtFetcher);
     connect(btnApply, &QPushButton::clicked, this, &DlgTagFetcher::apply);
     connect(btnQuit, &QPushButton::clicked, this, &DlgTagFetcher::quit);
     connect(results, &QTreeWidget::currentItemChanged, this, &DlgTagFetcher::resultSelected);
@@ -108,6 +107,15 @@ void DlgTagFetcher::init() {
     connect(&m_tagFetcher, &TagFetcher::networkError, this, &DlgTagFetcher::slotNetworkResult);
 
     connect(&m_tagFetcher,
+            &TagFetcher::coverArtThumbnailFetchAvailable,
+            this,
+            &DlgTagFetcher::fetchThumbnailFinished);
+    connect(coverArtResults,
+            &QTreeWidget::currentItemChanged,
+            this,
+            &DlgTagFetcher::coverArtResultSelected);
+
+    connect(&m_tagFetcher,
             &TagFetcher::coverArtUrlsAvailable,
             this,
             &DlgTagFetcher::fetchCoverArtUrlFinished);
@@ -115,11 +123,6 @@ void DlgTagFetcher::init() {
             &TagFetcher::coverArtImageFetchAvailable,
             this,
             &DlgTagFetcher::downloadCoverAndApply);
-
-    connect(&m_tagFetcher,
-            &TagFetcher::coverArtThumbnailFetchAvailable,
-            this,
-            &DlgTagFetcher::fetchThumbnailFinished);
 
     CoverArtCache* pCache = CoverArtCache::instance();
     if (pCache) {
@@ -165,10 +168,6 @@ void DlgTagFetcher::loadTrackInternal(const TrackPointer& track) {
     QPixmap pixmap;
     m_pFetchedCoverArt->setCoverArt(coverInfo, pixmap);
 
-    //Same for the status, I think i need a better solution for these.
-    QString status = "Cover Arts Fetching";
-    coverArtStatus->setText(status);
-
     disconnect(m_track.get(),
             &Track::changed,
             this,
@@ -206,7 +205,11 @@ void DlgTagFetcher::loadTrack(const QModelIndex& index) {
 
 void DlgTagFetcher::slotTrackChanged(TrackId trackId) {
     if (m_track && m_track->getId() == trackId) {
-        updateStack();
+        if (!btnCover->isEnabled()) {
+            updateCoverFetcher();
+        } else {
+            updateStack();
+        }
     }
 }
 
@@ -273,6 +276,17 @@ void DlgTagFetcher::apply() {
                 trackRelease.releaseGroupId);
     }
 #endif // __EXTRA_METADATA__
+
+    if (!btnCover->isEnabled()) {
+        QString status = "Cover art is applying";
+        coverArtStatus->setText(status);
+        btnApply->setDisabled(true);
+        btnNext->setDisabled(true);
+        btnPrev->setDisabled(true);
+        btnQuit->setDisabled(true);
+        fetchCoverArt();
+    }
+
     m_track->replaceMetadataFromSource(
             std::move(trackMetadata),
             // Prevent re-import of outdated metadata from file tags
@@ -310,6 +324,59 @@ void DlgTagFetcher::fetchTagFinished(
     loadCurrentTrackCover();
 }
 
+void DlgTagFetcher::updateCoverFetcher() {
+    if (m_data.m_pending) {
+        stack->setCurrentWidget(loading_page);
+        return;
+    } else if (m_networkResult == NetworkResult::HttpError) {
+        stack->setCurrentWidget(networkError_page);
+        return;
+    } else if (m_networkResult == NetworkResult::UnknownError) {
+        stack->setCurrentWidget(generalnetworkError_page);
+        return;
+    } else if (m_data.m_results.isEmpty()) {
+        stack->setCurrentWidget(error_page);
+        return;
+    }
+
+    btnApply->setEnabled(true);
+    btnCover->setDisabled(true);
+
+    stack->setCurrentWidget(coverFetcher_page);
+
+    coverArtResults->clear();
+
+    addDivider(tr("Original tags"), coverArtResults);
+    addTrack(trackColumnValues(*m_track), -1, coverArtResults);
+
+    addDivider(tr("Suggested tags"), coverArtResults);
+    {
+        int trackIndex = 0;
+        //Since duplicated results filtered from previous method
+        //This time we only filter the tracks which have cover art
+        for (const auto& trackRelease : qAsConst(m_data.m_results)) {
+            const auto columnValues = trackReleaseColumnValues(trackRelease);
+            if (m_resultsThumbnails.contains(trackRelease.albumReleaseId)) {
+                addTrack(columnValues, trackIndex, coverArtResults);
+            }
+            ++trackIndex;
+        }
+    }
+
+    for (int i = 0; i < coverArtResults->model()->columnCount(); i++) {
+        coverArtResults->resizeColumnToContents(i);
+        int sectionSize = (coverArtResults->columnWidth(i) + 10);
+        coverArtResults->header()->resizeSection(i, sectionSize);
+    }
+}
+
+void DlgTagFetcher::switchToCoverArtFetcher() {
+    m_tagFetcher.startFetchForCoverArt(m_data.m_results);
+    m_data.m_pending = true;
+    btnCover->setDisabled(true);
+    updateCoverFetcher();
+}
+
 void DlgTagFetcher::slotNetworkResult(
         int httpError, const QString& app, const QString& message, int code) {
     m_networkResult = httpError == 0 ? NetworkResult::UnknownError : NetworkResult::HttpError;
@@ -325,6 +392,7 @@ void DlgTagFetcher::slotNetworkResult(
 }
 
 void DlgTagFetcher::updateStack() {
+    btnCover->setDisabled(true);
     if (m_data.m_pending) {
         stack->setCurrentWidget(loading_page);
         return;
@@ -338,6 +406,7 @@ void DlgTagFetcher::updateStack() {
         stack->setCurrentWidget(error_page);
         return;
     }
+    btnCover->setEnabled(true);
     btnApply->setEnabled(true);
     stack->setCurrentWidget(results_page);
 
@@ -400,6 +469,14 @@ void DlgTagFetcher::resultSelected() {
     }
 
     const int resultIndex = results->currentItem()->data(0, Qt::UserRole).toInt();
+    m_data.m_selectedResult = resultIndex;
+}
+
+void DlgTagFetcher::coverArtResultSelected() {
+    if (!coverArtResults->currentItem()) {
+        return;
+    }
+    const int resultIndex = coverArtResults->currentItem()->data(0, Qt::UserRole).toInt();
     m_data.m_selectedResult = resultIndex;
 
     CoverInfo coverInfo;
@@ -500,6 +577,13 @@ void DlgTagFetcher::downloadCoverAndApply(const QByteArray& data) {
     coverInfo.setImage(updatedCoverArtFound);
     m_pCurrentCoverArt->setCoverArt(CoverInfo{}, QPixmap::fromImage(updatedCoverArtFound));
     m_track->setCoverInfo(coverInfo);
+
+    QString status = "Cover art is applied";
+    coverArtStatus->setText(status);
+    btnApply->setEnabled(true);
+    btnNext->setEnabled(true);
+    btnPrev->setEnabled(true);
+    btnQuit->setEnabled(true);
 }
 
 void DlgTagFetcher::getCoverArt(const QString& url) {
@@ -508,12 +592,12 @@ void DlgTagFetcher::getCoverArt(const QString& url) {
 
 void DlgTagFetcher::fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls) {
     m_resultsCoverArtAllUrls = coverArtAllUrls;
-    updateStack();
 }
 
 void DlgTagFetcher::fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes) {
-    QString status = "Cover Arts Found";
+    QString status = "Cover art is found";
     coverArtStatus->setText(status);
     m_resultsThumbnails = thumbnailBytes;
-    updateStack();
+    m_data.m_pending = false;
+    updateCoverFetcher();
 }

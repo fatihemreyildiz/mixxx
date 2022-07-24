@@ -293,6 +293,16 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
 
     auto pTrack = std::move(m_pTrack);
     cancel();
+
+    emit resultAvailable(
+            std::move(pTrack),
+            std::move(guessedTrackReleases));
+}
+
+void TagFetcher::startFetchForCoverArt(
+        const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases) {
+    emit fetchProgress(tr("Finding Possible Cover Arts on Cover Art Archive"));
+
     QList<QUuid> albumReleaseIds;
 
     foreach (auto& guessedTrackRelease, guessedTrackReleases) {
@@ -331,10 +341,6 @@ void TagFetcher::slotMusicBrainzTaskSucceeded(
 
     m_pCoverArtArchiveLinksTask->invokeStart(
             kCoverArtArchiveLinksTimeoutMilis);
-
-    emit resultAvailable(
-            std::move(pTrack),
-            std::move(guessedTrackReleases));
 }
 
 bool TagFetcher::onCoverArtArchiveLinksTaskTerminated() {
@@ -413,6 +419,8 @@ void TagFetcher::slotCoverArtArchiveLinksTaskSucceeded(
 
     auto pTrack = std::move(m_pTrack);
     cancel();
+
+    emit fetchProgress(tr("Cover Arts found, Getting Thumbnails."));
 
     m_pCoverArtArchiveThumbnailsTask = make_parented<mixxx::CoverArtArchiveThumbnailsTask>(
             &m_network,

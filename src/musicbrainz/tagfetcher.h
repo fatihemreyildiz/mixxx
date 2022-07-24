@@ -27,6 +27,8 @@ class TagFetcher : public QObject {
     void startFetch(
             TrackPointer pTrack);
 
+    void startFetchForCoverArt(const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
+
     void fetchDesiredResolutionCoverArt(
             const QString& coverArtUrl);
 
