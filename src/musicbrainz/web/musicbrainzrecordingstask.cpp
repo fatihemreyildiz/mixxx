@@ -166,6 +166,7 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
 
     // Continue with next recording id
     DEBUG_ASSERT(!m_queuedRecordingIds.isEmpty());
+    emit currentRecordingFetched();
     slotStart(m_parentTimeoutMillis);
 }
 
