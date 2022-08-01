@@ -313,17 +313,8 @@ void DlgTagFetcher::slotNetworkResult(
         QString cantConnect = tr("Can't connect to %1.");
         loadingProgressBar->setFormat(cantConnect.arg(app));
     }
-    //Some of the tracks can return XML, but they return either 203 or 403.
-    //The error 403 appears for some tracks permamently.
-    //Disabling the retry button could be an option for these tracks.
-    //But OTOH, some tracks can return suggested tags.
-    //After a few times of retry.
-    //More Info: https://bugs.launchpad.net/mixxx/+bug/1983204
-    if (code == 403) {
-        QString cantParse = tr("Unknown error while getting metadata.");
-        loadingProgressBar->setFormat(cantParse);
-    }
-    //If error is 203 that means there is no available metadata in response.
+    //Some of the tracks can return XML, but they return 203.
+    //That means there is no available metadata in response.
     //We let user know and prevent to retry fetching many times.
     //More Info: https://bugs.launchpad.net/mixxx/+bug/1983206
     if (code == 203) {

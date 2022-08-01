@@ -167,6 +167,14 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
     // Continue with next recording id
     DEBUG_ASSERT(!m_queuedRecordingIds.isEmpty());
     emit currentRecordingFetched();
+    // Some of the tracks has loads of RecordingIds.
+    // This can cause hitting the rate limits of MusicBrainz.
+    // According to the MusicBrainz API Doc: https://musicbrainz.org/doc/MusicBrainz_API/Rate_Limiting
+    // The rate limit should be one query in a second.
+    // Related Bug: https://bugs.launchpad.net/mixxx/+bug/1983204
+    // In order to not hit the rate limits and respect their rate limiting rule.
+    // We are going to delay every request by one second.
+    QThread::msleep(1000);
     slotStart(m_parentTimeoutMillis);
 }
 
