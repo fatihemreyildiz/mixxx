@@ -9,6 +9,7 @@
 #include "musicbrainz/musicbrainzxml.h"
 #include "network/httpstatuscode.h"
 #include "util/assert.h"
+#include "util/duration.h"
 #include "util/logger.h"
 #include "util/thread_affinity.h"
 #include "util/versionstore.h"
@@ -24,6 +25,8 @@ const QUrl kBaseUrl = QStringLiteral("https://musicbrainz.org/");
 const QString kRequestPath = QStringLiteral("/ws/2/recording/");
 
 const QByteArray kUserAgentRawHeaderKey = "User-Agent";
+
+mixxx::Duration kDelayDuration = mixxx::Duration::fromSeconds(1);
 
 QString userAgentRawHeaderValue() {
     return VersionStore::applicationName() +
@@ -72,7 +75,9 @@ MusicBrainzRecordingsTask::MusicBrainzRecordingsTask(
                   networkAccessManager,
                   parent),
           m_queuedRecordingIds(recordingIds),
+          m_timer(0),
           m_parentTimeoutMillis(0) {
+    m_timer.start();
     musicbrainz::registerMetaTypesOnce();
 }
 
@@ -174,7 +179,10 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
     // Related Bug: https://bugs.launchpad.net/mixxx/+bug/1983204
     // In order to not hit the rate limits and respect their rate limiting rule.
     // We are going to delay every request by one second.
-    QThread::msleep(1000);
+
+    while (m_timer.elapsed(true) < kDelayDuration) {
+    }
+    m_timer.restart(true);
     slotStart(m_parentTimeoutMillis);
 }
 

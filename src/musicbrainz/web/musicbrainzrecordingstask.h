@@ -8,6 +8,7 @@
 
 #include "musicbrainz/musicbrainz.h"
 #include "network/webtask.h"
+#include "util/timer.h"
 
 namespace mixxx {
 
@@ -53,6 +54,8 @@ class MusicBrainzRecordingsTask : public network::WebTask {
     QSet<QUuid> m_finishedRecordingIds;
 
     QMap<QUuid, musicbrainz::TrackRelease> m_trackReleases;
+
+    Timer m_timer;
 
     int m_parentTimeoutMillis;
 };
