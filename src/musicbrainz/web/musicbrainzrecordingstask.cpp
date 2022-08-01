@@ -26,7 +26,7 @@ const QString kRequestPath = QStringLiteral("/ws/2/recording/");
 
 const QByteArray kUserAgentRawHeaderKey = "User-Agent";
 
-mixxx::Duration kDelayDuration = mixxx::Duration::fromSeconds(1);
+mixxx::Duration kDelayDuration = mixxx::Duration::fromNanos(1000000000);
 
 QString userAgentRawHeaderValue() {
     return VersionStore::applicationName() +
@@ -179,11 +179,17 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
     // Related Bug: https://bugs.launchpad.net/mixxx/+bug/1983204
     // In order to not hit the rate limits and respect their rate limiting rule.
     // We are going to delay every request by one second.
-
-    while (m_timer.elapsed(true) < kDelayDuration) {
+    if (m_timer.elapsed(true).toIntegerSeconds() >= 1) {
+        m_timer.restart(true);
+        slotStart(m_parentTimeoutMillis);
+        return;
+    } else {
+        auto sleepDuration = (kDelayDuration.toIntegerMillis() -
+                m_timer.elapsed(true).toIntegerMillis());
+        QThread::msleep(sleepDuration);
+        m_timer.restart(true);
+        slotStart(m_parentTimeoutMillis);
     }
-    m_timer.restart(true);
-    slotStart(m_parentTimeoutMillis);
 }
 
 void MusicBrainzRecordingsTask::emitSucceeded(
