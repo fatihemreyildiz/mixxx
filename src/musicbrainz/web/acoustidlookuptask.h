@@ -37,6 +37,12 @@ class AcoustIdLookupTask : public network::JsonWebTask {
     void emitSucceeded(
             const QList<QUuid>& recordingIds);
 
+    void doLoopingTaskAborted() override{};
+
+    bool isTaskLooping() override {
+        return false;
+    };
+
     const QUrlQuery m_urlQuery;
 };
 

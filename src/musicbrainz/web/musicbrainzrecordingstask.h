@@ -35,9 +35,13 @@ class MusicBrainzRecordingsTask : public network::WebTask {
     QNetworkReply* doStartNetworkRequest(
             QNetworkAccessManager* networkAccessManager,
             int parentTimeoutMillis) override;
-    void doNetworkReplyFinished(
+    bool doNetworkReplyFinished(
             QNetworkReply* finishedNetworkReply,
             network::HttpStatusCode statusCode) override;
+
+    void doLoopingTaskAborted() override;
+
+    bool isTaskLooping() override;
 
     void emitSucceeded(
             const QList<musicbrainz::TrackRelease>& trackReleases);
@@ -48,6 +52,8 @@ class MusicBrainzRecordingsTask : public network::WebTask {
 
     void continueWithNextRequest();
 
+    void triggerSlotStart();
+
     const QUrlQuery m_urlQuery;
 
     QList<QUuid> m_queuedRecordingIds;
@@ -55,7 +61,9 @@ class MusicBrainzRecordingsTask : public network::WebTask {
 
     QMap<QUuid, musicbrainz::TrackRelease> m_trackReleases;
 
-    Timer m_timer;
+    QTimer m_requestTimer;
+
+    Timer m_measurementTimer;
 
     int m_parentTimeoutMillis;
 };

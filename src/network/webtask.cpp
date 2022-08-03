@@ -238,7 +238,7 @@ void WebTask::slotStart(int timeoutMillis) {
 
 void WebTask::slotAbort() {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
-    if (m_state != State::Pending) {
+    if (m_state != State::Pending && m_state != State::Looping) {
         DEBUG_ASSERT(m_timeoutTimerId == kInvalidTimerId);
         if (m_state == State::Idle) {
             kLogger.debug()
@@ -262,8 +262,13 @@ void WebTask::slotAbort() {
         m_timeoutTimerId = kInvalidTimerId;
     }
 
+    if (m_state == State::Looping) {
+        doLoopingTaskAborted();
+    }
+
     auto* const pPendingNetworkReply = m_pendingNetworkReplyWeakPtr.data();
     QUrl requestUrl;
+
     if (pPendingNetworkReply) {
         if (pPendingNetworkReply->isRunning()) {
             kLogger.debug()
@@ -277,6 +282,7 @@ void WebTask::slotAbort() {
             // continuing with the next statements.
             DEBUG_ASSERT(hasTerminated());
             DEBUG_ASSERT(!m_pendingNetworkReplyWeakPtr);
+            doNetworkReplyAborted(pPendingNetworkReply);
             return;
         }
         kLogger.debug()
@@ -376,23 +382,41 @@ void WebTask::slotNetworkReplyFinished() {
 
     const auto statusCode = readStatusCode(*pFinishedNetworkReply);
     if (pFinishedNetworkReply->error() != QNetworkReply::NetworkError::NoError) {
-        onNetworkError(
-                pFinishedNetworkReply->error(),
-                pFinishedNetworkReply->errorString(),
-                WebResponseWithContent{
-                        WebResponse{
-                                pFinishedNetworkReply->url(),
-                                pFinishedNetworkReply->request().url(),
-                                statusCode},
-                        readContentType(*pFinishedNetworkReply),
-                        readContentData(pFinishedNetworkReply).value_or(QByteArray{}),
-                });
-        DEBUG_ASSERT(hasTerminated());
-        return;
+        if (isTaskLooping() &&
+                pFinishedNetworkReply->error() ==
+                        QNetworkReply::NetworkError::ContentNotFoundError) {
+            kLogger.info()
+                    << this
+                    << "is Looping and received 404 in this request."
+                    << "This error is not fatal. That's why"
+                    << "this request is passed in order to get other results.";
+            DEBUG_ASSERT(m_state = State::Looping);
+            doNetworkReplyFinished(pFinishedNetworkReply, statusCode)
+                    ? m_state = State::Finished
+                    : m_state = State::Looping;
+            return;
+        } else {
+            onNetworkError(
+                    pFinishedNetworkReply->error(),
+                    pFinishedNetworkReply->errorString(),
+                    WebResponseWithContent{
+                            WebResponse{
+                                    pFinishedNetworkReply->url(),
+                                    pFinishedNetworkReply->request().url(),
+                                    statusCode},
+                            readContentType(*pFinishedNetworkReply),
+                            readContentData(pFinishedNetworkReply).value_or(QByteArray{}),
+                    });
+            DEBUG_ASSERT(hasTerminated());
+            return;
+        }
     }
 
-    m_state = State::Finished;
-    doNetworkReplyFinished(pFinishedNetworkReply, statusCode);
+    if (doNetworkReplyFinished(pFinishedNetworkReply, statusCode)) {
+        m_state = State::Finished;
+    } else {
+        m_state = State::Looping;
+    }
 }
 
 } // namespace network

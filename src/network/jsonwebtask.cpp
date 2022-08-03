@@ -244,7 +244,7 @@ QNetworkReply* JsonWebTask::doStartNetworkRequest(
             m_request.content);
 }
 
-void JsonWebTask::doNetworkReplyFinished(
+bool JsonWebTask::doNetworkReplyFinished(
         QNetworkReply* finishedNetworkReply,
         HttpStatusCode statusCode) {
     DEBUG_ASSERT(finishedNetworkReply);
@@ -262,12 +262,13 @@ void JsonWebTask::doNetworkReplyFinished(
                     std::move(webResponse),
                     std::move(contentTypeAndBytes.first),
                     std::move(contentTypeAndBytes.second)});
-            return;
+            return true;
         }
     }
     onFinished(JsonWebResponse{
             std::move(webResponse),
             optJsonContent.value_or(QJsonDocument{})});
+    return true;
 }
 
 void JsonWebTask::emitFailed(

@@ -150,6 +150,8 @@ class WebTask : public NetworkTask {
         Idle,
         // Pending state
         Pending,
+        // Looping state
+        Looping,
         // Terminal states
         Aborted,
         TimedOut,
@@ -189,8 +191,12 @@ class WebTask : public NetworkTask {
         Q_UNUSED(abortedNetworkReply);
     }
 
+    virtual bool isTaskLooping() = 0;
+
+    virtual void doLoopingTaskAborted() = 0;
+
     /// Handle network response.
-    virtual void doNetworkReplyFinished(
+    virtual bool doNetworkReplyFinished(
             QNetworkReply* finishedNetworkReply,
             HttpStatusCode statusCode) = 0;
 

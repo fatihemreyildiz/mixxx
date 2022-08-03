@@ -90,11 +90,12 @@ void DlgTagFetcher::init() {
             this,
             &DlgTagFetcher::progressBarSetCurrentStep);
     connect(&m_tagFetcher,
-            &TagFetcher::recordingsAvailable,
+            &TagFetcher::numberOfRecordingsToFetch,
             this,
             &DlgTagFetcher::progressBarSetTotalSteps);
     connect(&m_tagFetcher, &TagFetcher::networkError, this, &DlgTagFetcher::slotNetworkResult);
-    btnRetry->setEnabled(false);
+
+    btnRetry->setDisabled(true);
 }
 
 void DlgTagFetcher::slotNext() {
@@ -135,7 +136,7 @@ void DlgTagFetcher::loadTrackInternal(const TrackPointer& track) {
             &DlgTagFetcher::slotTrackChanged);
 
     m_tagFetcher.startFetch(m_track);
-
+    btnRetry->setDisabled(true);
     updateStack();
 }
 
@@ -251,6 +252,7 @@ void DlgTagFetcher::retry() {
             &DlgTagFetcher::slotTrackChanged);
 
     m_tagFetcher.startFetch(m_track);
+    btnRetry->setDisabled(true);
     updateStack();
 }
 
@@ -273,6 +275,7 @@ void DlgTagFetcher::progressBarSetCurrentStep() {
     loadingProgressBar->setValue(m_progressBarStep);
 }
 
+// TODO(fatihemreyildiz): display the task results one by one.
 void DlgTagFetcher::progressBarSetTotalSteps(int totalRecordingsFound) {
     // This function updates the bar with total metadata found for the track.
     // Tag Fetcher has 3 steps these are:
@@ -306,6 +309,7 @@ void DlgTagFetcher::slotNetworkResult(
         int code) {
     m_networkResult = httpError == 0 ? NetworkResult::UnknownError : NetworkResult::HttpError;
     m_data.m_pending = false;
+
     if (m_networkResult == NetworkResult::UnknownError) {
         QString unknownError = tr("Can't connect to %1 for an unknown reason.");
         loadingProgressBar->setFormat(unknownError.arg(app));
@@ -313,34 +317,28 @@ void DlgTagFetcher::slotNetworkResult(
         QString cantConnect = tr("Can't connect to %1.");
         loadingProgressBar->setFormat(cantConnect.arg(app));
     }
-    //Some of the tracks can return XML, but they return 203.
-    //That means there is no available metadata in response.
-    //We let user know and prevent to retry fetching many times.
-    //More Info: https://bugs.launchpad.net/mixxx/+bug/1983206
-    if (code == 203) {
-        QString cantParse = tr("Could not find this track in the MusicBrainz database.");
-        loadingProgressBar->setFormat(cantParse);
-    }
+
     btnRetry->setEnabled(true);
     updateStack();
 }
 
 void DlgTagFetcher::updateStack() {
+    m_progressBarStep = 0;
+    loadingProgressBar->setValue(m_progressBarStep);
+
     btnApply->setDisabled(true);
 
     successMessage->setVisible(false);
     loadingProgressBar->setVisible(true);
-    m_progressBarStep = 0;
-    loadingProgressBar->setValue(m_progressBarStep);
+
     results->clear();
     addDivider(tr("Original tags"), results);
     addTrack(trackColumnValues(*m_track), -1, results);
+
     if (m_data.m_pending) {
         return;
-    } else if (m_networkResult == NetworkResult::HttpError) {
-        loadingProgressBar->setValue(loadingProgressBar->maximum());
-        return;
-    } else if (m_networkResult == NetworkResult::UnknownError) {
+    } else if (m_networkResult == NetworkResult::HttpError ||
+            m_networkResult == NetworkResult::UnknownError) {
         loadingProgressBar->setValue(loadingProgressBar->maximum());
         return;
     } else if (m_data.m_results.isEmpty()) {
@@ -350,13 +348,13 @@ void DlgTagFetcher::updateStack() {
         loadingProgressBar->setFormat(emptyMessage);
         return;
     }
+
     btnApply->setEnabled(true);
     btnRetry->setEnabled(false);
+
     loadingProgressBar->setValue(loadingProgressBar->maximum());
     successMessage->setVisible(true);
     loadingProgressBar->setVisible(false);
-    QString finishedMessage = tr("The results are ready to be applied.");
-    loadingProgressBar->setFormat(finishedMessage);
 
     VERIFY_OR_DEBUG_ASSERT(m_track) {
         return;

@@ -26,7 +26,7 @@ const QString kRequestPath = QStringLiteral("/ws/2/recording/");
 
 const QByteArray kUserAgentRawHeaderKey = "User-Agent";
 
-mixxx::Duration kDelayDuration = mixxx::Duration::fromNanos(1000000000);
+static constexpr int kMinTimeBetweenMbRequests = 1000;
 
 QString userAgentRawHeaderValue() {
     return VersionStore::applicationName() +
@@ -75,10 +75,21 @@ MusicBrainzRecordingsTask::MusicBrainzRecordingsTask(
                   networkAccessManager,
                   parent),
           m_queuedRecordingIds(recordingIds),
-          m_timer(0),
+          m_measurementTimer(0),
           m_parentTimeoutMillis(0) {
-    m_timer.start();
     musicbrainz::registerMetaTypesOnce();
+    // Some of the tracks has loads of RecordingIds.
+    // This can cause hitting the rate limits of MusicBrainz.
+    // According to the MusicBrainz API Doc: https://musicbrainz.org/doc/MusicBrainz_API/Rate_Limiting
+    // The rate limit should be one query in a second.
+    // Related Bug: https://bugs.launchpad.net/mixxx/+bug/1983204
+    // In order to not hit the rate limits and respect their rate limiting rule.
+    // We are going to delay every request by one second.
+
+    connect(&m_requestTimer,
+            &QTimer::timeout,
+            this,
+            &MusicBrainzRecordingsTask::triggerSlotStart);
 }
 
 QNetworkReply* MusicBrainzRecordingsTask::doStartNetworkRequest(
@@ -105,10 +116,13 @@ QNetworkReply* MusicBrainzRecordingsTask::doStartNetworkRequest(
                 << "GET"
                 << networkRequest.url();
     }
+
+    m_measurementTimer.start();
+
     return networkAccessManager->get(networkRequest);
 }
 
-void MusicBrainzRecordingsTask::doNetworkReplyFinished(
+bool MusicBrainzRecordingsTask::doNetworkReplyFinished(
         QNetworkReply* finishedNetworkReply,
         network::HttpStatusCode statusCode) {
     DEBUG_ASSERT_QOBJECT_THREAD_AFFINITY(this);
@@ -135,7 +149,7 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
                         statusCode),
                 error.code,
                 error.message);
-        return;
+        return true;
     }
 
     auto recordingsResult = musicbrainz::parseRecordings(reader);
@@ -157,7 +171,7 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
                         statusCode),
                 -1,
                 QStringLiteral("Failed to parse XML response"));
-        return;
+        return m_queuedRecordingIds.isEmpty() ? true : false;
     }
 
     if (m_queuedRecordingIds.isEmpty()) {
@@ -166,29 +180,42 @@ void MusicBrainzRecordingsTask::doNetworkReplyFinished(
         auto trackReleases = m_trackReleases.values();
         m_trackReleases.clear();
         emitSucceeded(trackReleases);
-        return;
+        return true;
     }
 
     // Continue with next recording id
     DEBUG_ASSERT(!m_queuedRecordingIds.isEmpty());
     emit currentRecordingFetched();
-    // Some of the tracks has loads of RecordingIds.
-    // This can cause hitting the rate limits of MusicBrainz.
-    // According to the MusicBrainz API Doc: https://musicbrainz.org/doc/MusicBrainz_API/Rate_Limiting
-    // The rate limit should be one query in a second.
-    // Related Bug: https://bugs.launchpad.net/mixxx/+bug/1983204
-    // In order to not hit the rate limits and respect their rate limiting rule.
-    // We are going to delay every request by one second.
-    if (m_timer.elapsed(true).toIntegerSeconds() >= 1) {
-        m_timer.restart(true);
-        slotStart(m_parentTimeoutMillis);
-        return;
+    auto inhibitTimerElapsed = m_measurementTimer.elapsed(true);
+    int inhibitTimerElapsedMillis = inhibitTimerElapsed.toIntegerMillis();
+    qDebug() << "Task took:" << inhibitTimerElapsedMillis;
+    m_requestTimer.setSingleShot(true);
+    if (inhibitTimerElapsedMillis >= kMinTimeBetweenMbRequests) {
+        qDebug() << "Task took more than a second, slot is calling now.";
+        m_requestTimer.start(1);
     } else {
-        auto sleepDuration = (kDelayDuration.toIntegerMillis() -
-                m_timer.elapsed(true).toIntegerMillis());
-        QThread::msleep(sleepDuration);
-        m_timer.restart(true);
-        slotStart(m_parentTimeoutMillis);
+        auto sleepDuration = (kMinTimeBetweenMbRequests -
+                inhibitTimerElapsedMillis);
+        qDebug() << "Task took less than a second, slot is going to be called in:" << sleepDuration;
+        m_requestTimer.start(sleepDuration);
+    }
+    m_measurementTimer.restart(true);
+    return false;
+}
+
+void MusicBrainzRecordingsTask::triggerSlotStart() {
+    slotStart(m_parentTimeoutMillis);
+}
+
+void MusicBrainzRecordingsTask::doLoopingTaskAborted() {
+    kLogger.info()
+            << "Aborted task was looping."
+            << "Is QTimer active?"
+            << m_requestTimer.isActive();
+    if (m_requestTimer.isActive()) {
+        m_requestTimer.stop();
+        kLogger.info()
+                << "QTimer is stopped.";
     }
 }
 
@@ -201,7 +228,19 @@ void MusicBrainzRecordingsTask::emitSucceeded(
         deleteLater();
         return;
     }
+    m_requestTimer.stop();
     emit succeeded(trackReleases);
+}
+
+bool MusicBrainzRecordingsTask::isTaskLooping() {
+    kLogger.info()
+            << "Checking if"
+            << this
+            << "is a looping task. There are "
+            << m_queuedRecordingIds.size()
+            << "Recording IDs are on the queue.";
+
+    return m_queuedRecordingIds.size() > 0 ? true : false;
 }
 
 void MusicBrainzRecordingsTask::emitFailed(
