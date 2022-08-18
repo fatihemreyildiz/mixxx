@@ -82,6 +82,25 @@ void DlgCoverArtFullSize::init(TrackPointer pTrack) {
     slotLoadTrack(pTrack);
 }
 
+void DlgCoverArtFullSize::init(QByteArray fetchedCoverArtBytes) {
+    auto defaultCover = QPixmap(CoverArtUtils::defaultCoverLocation());
+
+    QPixmap image;
+    image.loadFromData(fetchedCoverArtBytes);
+
+    resize(image.size().width(), image.size().height());
+    show();
+    raise();
+    activateWindow();
+
+    // TODO: This can be changed to release info found on the musicbrainz
+    QString fetchedCoverArtWindowTitle = "Fetched Cover Art";
+
+    setWindowTitle(fetchedCoverArtWindowTitle);
+
+    coverArt->setPixmap(defaultCover);
+}
+
 void DlgCoverArtFullSize::slotLoadTrack(TrackPointer pTrack) {
     if (m_pLoadedTrack != nullptr) {
         disconnect(m_pLoadedTrack.get(),

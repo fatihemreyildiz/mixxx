@@ -79,10 +79,13 @@ void WCoverArtLabel::contextMenuEvent(QContextMenuEvent* event) {
     event->accept();
     m_pCoverMenu->popup(event->globalPos());
 }
-<<<<<<< HEAD
 
 void WCoverArtLabel::loadTrack(TrackPointer pTrack) {
     m_pLoadedTrack = pTrack;
+}
+
+void WCoverArtLabel::loadData(const QByteArray& data) {
+    m_Data = data;
 }
 
 void WCoverArtLabel::mousePressEvent(QMouseEvent* event) {
@@ -94,7 +97,12 @@ void WCoverArtLabel::mousePressEvent(QMouseEvent* event) {
         if (m_pDlgFullSize->isVisible()) {
             m_pDlgFullSize->close();
         } else {
-            m_pDlgFullSize->init(m_pLoadedTrack);
+            if (!m_pLoadedTrack) // && !m_Data.isNull(), will be added after the cover art fetched
+            {
+                m_pDlgFullSize->init(m_Data);
+            } else {
+                m_pDlgFullSize->init(m_pLoadedTrack);
+            }
         }
     }
 }

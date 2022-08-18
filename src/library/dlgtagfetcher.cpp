@@ -65,8 +65,9 @@ DlgTagFetcher::DlgTagFetcher(
         : QDialog(nullptr),
           m_pTrackModel(pTrackModel),
           m_tagFetcher(this),
-          m_pCurrentCoverArt(make_parented<CoverArtLabel>(this)),
-          m_pFetchedCoverArt(make_parented<CoverArtLabel>(this)),
+          m_pWCoverArtMenu(make_parented<WCoverArtMenu>(this)),
+          m_pWCurrentCoverArtLabel(make_parented<WCoverArtLabel>(this, m_pWCoverArtMenu)),
+          m_pWFetchedCoverArtLabel(make_parented<WCoverArtLabel>(this)),
           m_networkResult(NetworkResult::Ok) {
     init();
 }
@@ -78,12 +79,12 @@ void DlgTagFetcher::init() {
     currentCoverArtLayout->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignCenter);
     currentCoverArtLayout->setSpacing(0);
     currentCoverArtLayout->setContentsMargins(0, 0, 0, 0);
-    currentCoverArtLayout->insertWidget(0, m_pCurrentCoverArt.get());
+    currentCoverArtLayout->insertWidget(0, m_pWCurrentCoverArtLabel.get());
 
     fetchedCoverArtLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom | Qt::AlignCenter);
     fetchedCoverArtLayout->setSpacing(0);
     fetchedCoverArtLayout->setContentsMargins(0, 0, 0, 0);
-    fetchedCoverArtLayout->insertWidget(0, m_pFetchedCoverArt.get());
+    fetchedCoverArtLayout->insertWidget(0, m_pWFetchedCoverArtLabel.get());
 
     if (m_pTrackModel) {
         connect(btnPrev, &QPushButton::clicked, this, &DlgTagFetcher::slotPrev);
@@ -250,7 +251,7 @@ void DlgTagFetcher::quit() {
 }
 
 void DlgTagFetcher::loadCurrentTrackCover() {
-    m_pCurrentCoverArt->loadTrack(m_track);
+    m_pWCurrentCoverArtLabel->loadTrack(m_track);
     CoverArtCache* pCache = CoverArtCache::instance();
     pCache->requestTrackCover(this, m_track);
 }
@@ -378,6 +379,6 @@ void DlgTagFetcher::slotCoverFound(
             m_track &&
             m_track->getLocation() == coverInfo.trackLocation) {
         m_trackRecord.setCoverInfo(coverInfo);
-        m_pCurrentCoverArt->setCoverArt(coverInfo, pixmap);
+        m_pWCurrentCoverArtLabel->setCoverArt(coverInfo, pixmap);
     }
 }
