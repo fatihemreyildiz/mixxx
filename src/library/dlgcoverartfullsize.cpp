@@ -11,10 +11,13 @@
 #include "track/track.h"
 #include "util/widgethelper.h"
 
-DlgCoverArtFullSize::DlgCoverArtFullSize(QWidget* parent, BaseTrackPlayer* pPlayer)
+DlgCoverArtFullSize::DlgCoverArtFullSize(
+        QWidget* parent,
+        BaseTrackPlayer* pPlayer,
+        WCoverArtMenu* pCoverMenu)
         : QDialog(parent),
           m_pPlayer(pPlayer),
-          m_pCoverMenu(make_parented<WCoverArtMenu>(this)) {
+          m_pCoverMenu(pCoverMenu) {
     CoverArtCache* pCache = CoverArtCache::instance();
     if (pCache) {
         connect(pCache,
@@ -28,14 +31,16 @@ DlgCoverArtFullSize::DlgCoverArtFullSize(QWidget* parent, BaseTrackPlayer* pPlay
             &DlgCoverArtFullSize::customContextMenuRequested,
             this,
             &DlgCoverArtFullSize::slotCoverMenu);
-    connect(m_pCoverMenu,
-            &WCoverArtMenu::coverInfoSelected,
-            this,
-            &DlgCoverArtFullSize::slotCoverInfoSelected);
-    connect(m_pCoverMenu,
-            &WCoverArtMenu::reloadCoverArt,
-            this,
-            &DlgCoverArtFullSize::slotReloadCoverArt);
+    if (m_pCoverMenu != nullptr) {
+        connect(m_pCoverMenu,
+                &WCoverArtMenu::coverInfoSelected,
+                this,
+                &DlgCoverArtFullSize::slotCoverInfoSelected);
+        connect(m_pCoverMenu,
+                &WCoverArtMenu::reloadCoverArt,
+                this,
+                &DlgCoverArtFullSize::slotReloadCoverArt);
+    }
 
     if (m_pPlayer != nullptr) {
         connect(pPlayer,
@@ -75,6 +80,25 @@ void DlgCoverArtFullSize::init(TrackPointer pTrack) {
     // This must be called after show() to set the window title. Refer to the
     // comment in slotLoadTrack for details.
     slotLoadTrack(pTrack);
+}
+
+void DlgCoverArtFullSize::init(QByteArray fetchedCoverArtBytes) {
+    auto defaultCover = QPixmap(CoverArtUtils::defaultCoverLocation());
+
+    QPixmap image;
+    image.loadFromData(fetchedCoverArtBytes);
+
+    resize(image.size().width(), image.size().height());
+    show();
+    raise();
+    activateWindow();
+
+    // TODO: This can be changed to release info found on the musicbrainz
+    QString fetchedCoverArtWindowTitle = "Fetched Cover Art";
+
+    setWindowTitle(fetchedCoverArtWindowTitle);
+
+    coverArt->setPixmap(defaultCover);
 }
 
 void DlgCoverArtFullSize::slotLoadTrack(TrackPointer pTrack) {
@@ -219,7 +243,10 @@ void DlgCoverArtFullSize::slotCoverInfoSelected(
 }
 
 void DlgCoverArtFullSize::mousePressEvent(QMouseEvent* event) {
-    if (!m_pCoverMenu->isVisible() && event->button() == Qt::LeftButton) {
+    if (event->button() != Qt::LeftButton) {
+        return;
+    }
+    if ((m_pCoverMenu != nullptr && !m_pCoverMenu->isVisible()) || m_pCoverMenu == nullptr) {
         m_clickTimer.setSingleShot(true);
         m_clickTimer.start(500);
         m_coverPressed = true;
@@ -234,7 +261,7 @@ void DlgCoverArtFullSize::mousePressEvent(QMouseEvent* event) {
 
 void DlgCoverArtFullSize::mouseReleaseEvent(QMouseEvent* event) {
     m_coverPressed = false;
-    if (m_pCoverMenu->isVisible()) {
+    if (m_pCoverMenu != nullptr && m_pCoverMenu->isVisible()) {
         return;
     }
 
@@ -265,7 +292,9 @@ void DlgCoverArtFullSize::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void DlgCoverArtFullSize::slotCoverMenu(const QPoint& pos) {
-    m_pCoverMenu->popup(mapToGlobal(pos));
+    if (m_pCoverMenu != nullptr) {
+        m_pCoverMenu->popup(mapToGlobal(pos));
+    }
 }
 
 void DlgCoverArtFullSize::resizeEvent(QResizeEvent* event) {
