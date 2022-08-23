@@ -790,6 +790,9 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/musicbrainz/musicbrainzxml.cpp
   src/musicbrainz/tagfetcher.cpp
   src/musicbrainz/web/acoustidlookuptask.cpp
+  src/musicbrainz/web/coverartarchiveimagetask.cpp
+  src/musicbrainz/web/coverartarchivelinkstask.cpp
+  src/musicbrainz/web/coverartarchivethumbnailstask.cpp
   src/musicbrainz/web/musicbrainzrecordingstask.cpp
   src/network/jsonwebtask.cpp
   src/network/networktask.cpp

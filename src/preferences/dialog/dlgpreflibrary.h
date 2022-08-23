@@ -20,6 +20,12 @@ class DlgPrefLibrary : public DlgPreferencePage, public Ui::DlgPrefLibraryDlg  {
         Ignore = 3,
     };
 
+    enum class CoverArtFetcherQuality : int {
+        Lowest = 0,
+        Medium = 1,
+        Highest = 2,
+    };
+
     DlgPrefLibrary(
             QWidget* pParent,
             UserSettingsPointer pConfig,

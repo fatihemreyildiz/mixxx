@@ -82,9 +82,11 @@ class JsonWebTask : public WebTask {
 
   protected:
     // Customizable in derived classes
+    // This is added for sequence of requests to get cover art.
     virtual QNetworkReply* sendNetworkRequest(
             QNetworkAccessManager* networkAccessManager,
             HttpRequestMethod method,
+            int parentTimeoutMillis,
             const QUrl& url,
             const QJsonDocument& content);
 

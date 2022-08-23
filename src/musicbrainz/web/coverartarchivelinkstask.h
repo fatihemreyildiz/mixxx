@@ -1,29 +1,36 @@
 #pragma once
 
-#include <QString>
 #include <QList>
+#include <QMap>
+#include <QString>
 #include <QUuid>
 
 #include "network/jsonwebtask.h"
 
 namespace mixxx {
 
-class AcoustIdLookupTask : public network::JsonWebTask {
+class CoverArtArchiveLinksTask : public network::JsonWebTask {
     Q_OBJECT
 
   public:
-    AcoustIdLookupTask(
+    CoverArtArchiveLinksTask(
             QNetworkAccessManager* networkAccessManager,
-            const QString& fingerprint,
-            int duration,
+            QList<QUuid>&& albumReleaseIds,
             QObject* parent = nullptr);
-    ~AcoustIdLookupTask() override = default;
+
+    ~CoverArtArchiveLinksTask() override = default;
 
   signals:
     void succeeded(
-            const QList<QUuid>& recordingIds);
+            const QMap<QUuid, QString>& smallThumbnailUrls);
 
-  protected:
+    void succeededLinks(
+            const QMap<QUuid, QList<QString>>& coverArtAllUrls);
+
+    void failed(
+            const mixxx::network::JsonWebResponse& response);
+
+  private:
     QNetworkReply* sendNetworkRequest(
             QNetworkAccessManager* networkAccessManager,
             network::HttpRequestMethod method,
@@ -31,12 +38,11 @@ class AcoustIdLookupTask : public network::JsonWebTask {
             const QUrl& url,
             const QJsonDocument& content) override;
 
-  private:
     void onFinished(
             const network::JsonWebResponse& response) override;
 
     void emitSucceeded(
-            const QList<QUuid>& recordingIds);
+            const QMap<QUuid, QString>& smallThumbnailUrls);
 
     void doLoopingTaskAborted() override{};
 
@@ -44,7 +50,14 @@ class AcoustIdLookupTask : public network::JsonWebTask {
         return false;
     };
 
-    const QUrlQuery m_urlQuery;
-};
+    QList<QUuid> m_queuedAlbumReleaseIds;
 
+    QList<QString> m_allThumbnailUrls;
+
+    QMap<QUuid, QString> m_smallThumbnailUrls;
+
+    QMap<QUuid, QList<QString>> m_coverArtUrls;
+
+    int m_parentTimeoutMillis;
+};
 } // namespace mixxx

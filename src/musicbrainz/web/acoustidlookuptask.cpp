@@ -81,6 +81,7 @@ AcoustIdLookupTask::AcoustIdLookupTask(
 QNetworkReply* AcoustIdLookupTask::sendNetworkRequest(
         QNetworkAccessManager* networkAccessManager,
         network::HttpRequestMethod method,
+        int parentTimeoutMillis,
         const QUrl& url,
         const QJsonDocument& content) {
     Q_UNUSED(method);

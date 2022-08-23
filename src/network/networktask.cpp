@@ -66,6 +66,25 @@ void NetworkTask::emitAborted(
     emit aborted(requestUrl);
 }
 
+void NetworkTask::emitNotFound(QNetworkReply::NetworkError errorCode,
+        const QString& errorString,
+        const QUrl& requestUrl) {
+    VERIFY_OR_DEBUG_ASSERT(
+            isSignalFuncConnected(&NetworkTask::notFound)) {
+        kLogger.warning()
+                << this
+                << errorString
+                << "Unhandled not found signal"
+                << errorCode
+                << requestUrl;
+        deleteLater();
+        return;
+    }
+    qDebug() << errorString;
+    qDebug() << errorCode;
+    emit notFound(errorCode, errorString, requestUrl);
+}
+
 } // namespace network
 
 } // namespace mixxx

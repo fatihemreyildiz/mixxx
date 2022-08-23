@@ -4,6 +4,7 @@
 #include <QList>
 #include <QTreeWidget>
 
+#include "library/coverartlabel.h"
 #include "library/trackmodel.h"
 #include "library/ui_dlgtagfetcher.h"
 #include "musicbrainz/tagfetcher.h"
@@ -23,7 +24,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
   public:
     // TODO: Remove dependency on TrackModel
     explicit DlgTagFetcher(
-            const TrackModel* pTrackModel = nullptr);
+            UserSettingsPointer pConfig, const TrackModel* pTrackModel = nullptr);
     ~DlgTagFetcher() override = default;
 
     void init();
@@ -40,7 +41,10 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void fetchTagFinished(
             TrackPointer pTrack,
             const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
+    void fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls);
+    void fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes);
     void resultSelected();
+    //void coverArtResultSelected();
     void fetchTagProgress(const QString&);
     void progressBarSetTotalSteps(int totalRecordingsFound);
     void progressBarSetCurrentStep();
@@ -49,6 +53,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void apply();
     void retry();
     void quit();
+    void fetchCoverArt();
     void slotNext();
     void slotPrev();
     void slotCoverFound(
@@ -57,12 +62,19 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
             const QPixmap& pixmap,
             mixxx::cache_key_t requestedCacheKey,
             bool coverInfoUpdated);
+    void updateFetchedCoverArtLayout(const QByteArray& thumbnailResultBytes);
+    void downloadCoverAndApply(const QByteArray& data);
 
   private:
     void loadCurrentTrackCover();
+    void switchToCoverArtFetcher();
     void loadTrackInternal(const TrackPointer& track);
     void updateStack();
+    void updateCoverFetcher();
     void addDivider(const QString& text, QTreeWidget* parent) const;
+    void getCoverArt(const QString& url);
+
+    UserSettingsPointer m_pConfig;
 
     const TrackModel* const m_pTrackModel;
 
@@ -79,6 +91,10 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     mixxx::TrackRecord m_trackRecord;
 
     int m_progressBarStep;
+
+    QMap<QUuid, QByteArray> m_resultsThumbnails;
+
+    QMap<QUuid, QList<QString>> m_resultsCoverArtAllUrls;
 
     struct Data {
         Data()

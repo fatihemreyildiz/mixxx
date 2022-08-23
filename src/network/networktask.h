@@ -53,6 +53,10 @@ class NetworkTask : public QObject {
     void emitAborted(
             const QUrl& requestUrl = QUrl{});
 
+    void emitNotFound(QNetworkReply::NetworkError errorCode,
+            const QString& errorString,
+            const QUrl& requestUrl);
+
     /// All member variables must only be accessed from
     /// the event loop thread!!
     const SafeQPointer<QNetworkAccessManager> m_networkAccessManagerWeakPtr;
@@ -88,6 +92,10 @@ class NetworkTask : public QObject {
 
     /// Client-side abort
     void aborted(
+            const QUrl& requestUrl);
+
+    void notFound(QNetworkReply::NetworkError errorCode,
+            const QString& errorString,
             const QUrl& requestUrl);
 };
 
