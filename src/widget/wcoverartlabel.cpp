@@ -97,7 +97,10 @@ void WCoverArtLabel::mousePressEvent(QMouseEvent* event) {
         if (m_pDlgFullSize->isVisible()) {
             m_pDlgFullSize->close();
         } else {
-            if (!m_pLoadedTrack) // && !m_Data.isNull(), will be added after the cover art fetched
+            if (m_loadedCover.isNull()) {
+                return;
+            } else if (
+                    !m_pLoadedTrack) // && !m_Data.isNull(), will be added after the cover art fetched
             {
                 m_pDlgFullSize->init(m_Data);
             } else {

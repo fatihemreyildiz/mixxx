@@ -66,7 +66,7 @@ DlgTagFetcher::DlgTagFetcher(
           m_pTrackModel(pTrackModel),
           m_tagFetcher(this),
           m_pWCoverArtMenu(make_parented<WCoverArtMenu>(this)),
-          m_pWCurrentCoverArtLabel(make_parented<WCoverArtLabel>(this, m_pWCoverArtMenu)),
+          m_pWCurrentCoverArtLabel(make_parented<WCoverArtLabel>(this)),
           m_pWFetchedCoverArtLabel(make_parented<WCoverArtLabel>(this)),
           m_networkResult(NetworkResult::Ok) {
     init();
@@ -329,7 +329,6 @@ void DlgTagFetcher::fetchTagFinished(
     m_data.m_results = guessedTrackReleases;
     // qDebug() << "number of results = " << guessedTrackReleases.size();
     updateStack();
-    loadCurrentTrackCover();
 }
 
 void DlgTagFetcher::slotNetworkResult(
@@ -353,6 +352,7 @@ void DlgTagFetcher::slotNetworkResult(
 }
 
 void DlgTagFetcher::updateStack() {
+    loadCurrentTrackCover();
     m_progressBarStep = 0;
     loadingProgressBar->setValue(m_progressBarStep);
 
