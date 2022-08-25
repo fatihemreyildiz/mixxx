@@ -15,20 +15,14 @@ class CoverArtArchiveLinksTask : public network::JsonWebTask {
   public:
     CoverArtArchiveLinksTask(
             QNetworkAccessManager* networkAccessManager,
-            QList<QUuid>&& albumReleaseIds,
+            const QUuid& albumReleaseId,
             QObject* parent = nullptr);
 
     ~CoverArtArchiveLinksTask() override = default;
 
   signals:
     void succeeded(
-            const QMap<QUuid, QString>& smallThumbnailUrls);
-
-    void succeededLinks(
-            const QMap<QUuid, QList<QString>>& coverArtAllUrls);
-
-    void failed(
-            const mixxx::network::JsonWebResponse& response);
+            const QList<QString>& allUrls);
 
   private:
     QNetworkReply* sendNetworkRequest(
@@ -41,8 +35,7 @@ class CoverArtArchiveLinksTask : public network::JsonWebTask {
     void onFinished(
             const network::JsonWebResponse& response) override;
 
-    void emitSucceeded(
-            const QMap<QUuid, QString>& smallThumbnailUrls);
+    void emitSucceeded(const QList<QString>& allUrls);
 
     void doLoopingTaskAborted() override{};
 
@@ -50,13 +43,9 @@ class CoverArtArchiveLinksTask : public network::JsonWebTask {
         return false;
     };
 
-    QList<QUuid> m_queuedAlbumReleaseIds;
+    QUuid m_albumReleaseId;
 
     QList<QString> m_allThumbnailUrls;
-
-    QMap<QUuid, QString> m_smallThumbnailUrls;
-
-    QMap<QUuid, QList<QString>> m_coverArtUrls;
 
     int m_parentTimeoutMillis;
 };

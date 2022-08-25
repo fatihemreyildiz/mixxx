@@ -285,7 +285,7 @@
         </widget>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="successMessage">
+        <widget class="QLabel" name="statusMessage">
          <property name="text">
           <string>The results are ready to be applied.</string>
          </property>

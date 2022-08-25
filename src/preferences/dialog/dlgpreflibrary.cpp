@@ -207,6 +207,7 @@ void DlgPrefLibrary::slotResetToDefaults() {
     radioButton_dbclick_top->setChecked(false);
     radioButton_dbclick_deck->setChecked(true);
     radioButton_cover_art_fetcher_highest->setChecked(false);
+    radioButton_cover_art_fetcher_high->setChecked(false);
     radioButton_cover_art_fetcher_medium->setChecked(false);
     radioButton_cover_art_fetcher_lowest->setChecked(true);
     spinBoxRowHeight->setValue(Library::kDefaultRowHeightPx);
@@ -266,9 +267,12 @@ void DlgPrefLibrary::slotUpdate() {
 
     switch (m_pConfig->getValue<int>(
             kCoverArtFetcherQualityConfigKey,
-            static_cast<int>(CoverArtFetcherQuality::Lowest))) {
+            static_cast<int>(CoverArtFetcherQuality::Low))) {
     case static_cast<int>(CoverArtFetcherQuality::Highest):
         radioButton_cover_art_fetcher_highest->setChecked(true);
+        break;
+    case static_cast<int>(CoverArtFetcherQuality::High):
+        radioButton_cover_art_fetcher_high->setChecked(true);
         break;
     case static_cast<int>(CoverArtFetcherQuality::Medium):
         radioButton_cover_art_fetcher_medium->setChecked(true);
@@ -446,10 +450,12 @@ void DlgPrefLibrary::slotApply() {
     int coverartfetcherquality_status;
     if (radioButton_cover_art_fetcher_highest->isChecked()) {
         coverartfetcherquality_status = static_cast<int>(CoverArtFetcherQuality::Highest);
+    } else if (radioButton_cover_art_fetcher_high->isChecked()) {
+        coverartfetcherquality_status = static_cast<int>(CoverArtFetcherQuality::High);
     } else if (radioButton_cover_art_fetcher_medium->isChecked()) {
         coverartfetcherquality_status = static_cast<int>(CoverArtFetcherQuality::Medium);
     } else {
-        coverartfetcherquality_status = static_cast<int>(CoverArtFetcherQuality::Lowest);
+        coverartfetcherquality_status = static_cast<int>(CoverArtFetcherQuality::Low);
     }
     m_pConfig->set(kCoverArtFetcherQualityConfigKey, ConfigValue(coverartfetcherquality_status));
 

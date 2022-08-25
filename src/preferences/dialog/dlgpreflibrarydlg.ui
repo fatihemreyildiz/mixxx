@@ -442,7 +442,7 @@
        </widget>
       </item>
       <item row="7" column="0">
-       <widget class="QLabel" name="label_10">
+       <widget class="QLabel" name="label_11">
         <property name="text">
          <string>You will need to restart Mixxx for these settings to take effect.</string>
         </property>
@@ -461,13 +461,22 @@
       <item row="0" column="0">
        <widget class="QRadioButton" name="radioButton_cover_art_fetcher_highest">
         <property name="text">
-         <string>High</string>
+         <string>Highest</string>
         </property>
         <property name="checked">
         </property>
        </widget>
       </item>
       <item row="1" column="0">
+       <widget class="QRadioButton" name="radioButton_cover_art_fetcher_high">
+        <property name="text">
+         <string>High</string>
+        </property>
+        <property name="checked">
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="QRadioButton" name="radioButton_cover_art_fetcher_medium">
         <property name="text">
          <string>Medium</string>
@@ -476,7 +485,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QRadioButton" name="radioButton_cover_art_fetcher_lowest">
         <property name="text">
          <string>Low</string>
@@ -485,10 +494,17 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_10">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_12">
         <property name="text">
-         <string>Try out for cover art fetcher.</string>
+         <string>Fetch cover art from coverartarchive.com by using Import Metadata From Musicbrainz.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Highest resolution can fetch up to very large cover arts. </string>
         </property>
        </widget>
       </item>
@@ -591,6 +607,7 @@
   <tabstop>checkBox_show_rekordbox</tabstop>
   <tabstop>checkBox_show_serato</tabstop>
   <tabstop>radioButton_cover_art_fetcher_highest</tabstop>
+  <tabstop>radioButton_cover_art_fetcher_high</tabstop>
   <tabstop>radioButton_cover_art_fetcher_medium</tabstop>
   <tabstop>radioButton_cover_art_fetcher_lowest</tabstop>
   <tabstop>PushButtonOpenSettingsDir</tabstop>

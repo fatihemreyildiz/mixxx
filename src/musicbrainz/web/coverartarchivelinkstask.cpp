@@ -42,14 +42,14 @@ QNetworkRequest createNetworkRequest(
 
 CoverArtArchiveLinksTask::CoverArtArchiveLinksTask(
         QNetworkAccessManager* networkAccessManager,
-        QList<QUuid>&& albumReleaseIds,
+        const QUuid& albumReleaseId,
         QObject* parent)
         : network::JsonWebTask(
                   networkAccessManager,
                   kBaseUrl,
                   lookupRequest(),
                   parent),
-          m_queuedAlbumReleaseIds(albumReleaseIds),
+          m_albumReleaseId(albumReleaseId),
           m_parentTimeoutMillis(0) {
 }
 
@@ -60,15 +60,14 @@ QNetworkReply* CoverArtArchiveLinksTask::sendNetworkRequest(
         const QUrl& url,
         const QJsonDocument& content) {
     DEBUG_ASSERT(networkAccessManager);
-    DEBUG_ASSERT(!m_queuedAlbumReleaseIds.first().isNull());
+    //DEBUG_ASSERT(!m_queuedAlbumReleaseIds.first().isNull());
     Q_UNUSED(method);
     DEBUG_ASSERT(method == network::HttpRequestMethod::Get);
     networkAccessManager->setRedirectPolicy(QNetworkRequest::NoLessSafeRedirectPolicy);
 
     m_parentTimeoutMillis = parentTimeoutMillis;
 
-    // It is not takefirst because we will need it to store the QMap's later on, before the new request this index will be deleted
-    const QNetworkRequest networkRequest = createNetworkRequest(m_queuedAlbumReleaseIds.first());
+    const QNetworkRequest networkRequest = createNetworkRequest(m_albumReleaseId);
 
     VERIFY_OR_DEBUG_ASSERT(url.isValid()) {
         kLogger.warning() << "Invalid URL" << url;
@@ -84,23 +83,6 @@ QNetworkReply* CoverArtArchiveLinksTask::sendNetworkRequest(
 
 void CoverArtArchiveLinksTask::onFinished(
         const network::JsonWebResponse& response) {
-    //This is added only for to get Url of the images
-    //I tried few ways, they didn't work at all
-    //This was the only one who solved the issue behind
-    //blocking the sequence of requests
-    if (response.statusCode() == 404) {
-        qDebug() << "No image link found for this request";
-        m_queuedAlbumReleaseIds.removeFirst();
-        if (m_queuedAlbumReleaseIds.isEmpty()) {
-            qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
-            emit succeededLinks(m_coverArtUrls);
-            emitSucceeded(m_smallThumbnailUrls);
-            return;
-        }
-        slotStart(m_parentTimeoutMillis);
-        return;
-    }
-
     if (!response.isStatusCodeSuccess()) {
         kLogger.warning()
                 << "Request failed with HTTP status code"
@@ -130,49 +112,43 @@ void CoverArtArchiveLinksTask::onFinished(
         emitFailed(response);
         return;
     }
+
     QList<QString> allUrls;
     DEBUG_ASSERT(jsonObject.value(QLatin1String("images")).isArray());
     const QJsonArray images = jsonObject.value(QLatin1String("images")).toArray();
     for (const auto& image : images) {
         DEBUG_ASSERT(image.isObject());
         const auto imageObject = image.toObject();
-        if (!(imageObject.value(QLatin1String("image")).isNull())) {
-            const auto highestResolutionImageUrl =
-                    imageObject.value(QLatin1String("image")).toString();
-            allUrls.append(highestResolutionImageUrl);
-        }
+
         const auto thumbnails = imageObject.value(QLatin1String("thumbnails")).toObject();
         DEBUG_ASSERT(!thumbnails.isEmpty());
+
+        const auto smallThumbnailUrl = thumbnails.value(QLatin1String("small")).toString();
+        DEBUG_ASSERT(!smallThumbnailUrl.isNull());
+        allUrls.append(smallThumbnailUrl);
+
+        const auto largeThumbnailUrl = thumbnails.value(QLatin1String("large")).toString();
+        DEBUG_ASSERT(!largeThumbnailUrl.isNull());
+        allUrls.append(largeThumbnailUrl);
 
         if (thumbnails.value(QLatin1String("1200")).toString() != nullptr) {
             const auto largestThumbnailUrl = thumbnails.value(QLatin1String("1200")).toString();
             allUrls.append(largestThumbnailUrl);
         }
 
-        const auto smallThumbnailUrl = thumbnails.value(QLatin1String("small")).toString();
-        DEBUG_ASSERT(!smallThumbnailUrl.isNull());
-        const auto largeThumbnailUrl = thumbnails.value(QLatin1String("large")).toString();
-        DEBUG_ASSERT(!largeThumbnailUrl.isNull());
-        m_smallThumbnailUrls.insert(m_queuedAlbumReleaseIds.first(), smallThumbnailUrl);
-        allUrls.append(largeThumbnailUrl);
-        allUrls.append(smallThumbnailUrl);
-        m_coverArtUrls.insert(m_queuedAlbumReleaseIds.first(), allUrls);
+        if (!(imageObject.value(QLatin1String("image")).isNull())) {
+            const auto highestResolutionImageUrl =
+                    imageObject.value(QLatin1String("image")).toString();
+            allUrls.append(highestResolutionImageUrl);
+        }
+
         break;
     }
-    m_queuedAlbumReleaseIds.removeFirst();
-    if (m_queuedAlbumReleaseIds.isEmpty()) {
-        qDebug() << m_smallThumbnailUrls.size() << " Possible Thumbnail Links found.";
-        emit succeededLinks(m_coverArtUrls);
-        emitSucceeded(m_smallThumbnailUrls);
-        return;
-    }
-    DEBUG_ASSERT(!m_queuedAlbumReleaseIds.isEmpty());
-    // Continue with next album release id
-    slotStart(m_parentTimeoutMillis);
+    emitSucceeded(allUrls);
 }
 
 void CoverArtArchiveLinksTask::emitSucceeded(
-        const QMap<QUuid, QString>& coverArtThumbnailUrls) {
+        const QList<QString>& allUrls) {
     VERIFY_OR_DEBUG_ASSERT(
             isSignalFuncConnected(&CoverArtArchiveLinksTask::succeeded)) {
         kLogger.warning()
@@ -180,7 +156,7 @@ void CoverArtArchiveLinksTask::emitSucceeded(
         deleteLater();
         return;
     }
-    emit succeeded(coverArtThumbnailUrls);
+    emit succeeded(allUrls);
 }
 
 } // namespace mixxx

@@ -82,9 +82,7 @@ void DlgCoverArtFullSize::init(TrackPointer pTrack) {
     slotLoadTrack(pTrack);
 }
 
-void DlgCoverArtFullSize::init(QByteArray fetchedCoverArtBytes) {
-    auto defaultCover = QPixmap(CoverArtUtils::defaultCoverLocation());
-
+void DlgCoverArtFullSize::init(const QByteArray& fetchedCoverArtBytes) {
     QPixmap image;
     image.loadFromData(fetchedCoverArtBytes);
 
@@ -93,12 +91,12 @@ void DlgCoverArtFullSize::init(QByteArray fetchedCoverArtBytes) {
     raise();
     activateWindow();
 
-    // TODO: This can be changed to release info found on the musicbrainz
     QString fetchedCoverArtWindowTitle = "Fetched Cover Art";
 
     setWindowTitle(fetchedCoverArtWindowTitle);
 
-    coverArt->setPixmap(defaultCover);
+    //TODO: Do a better scaling. It populates wrong if the cover art size highest.
+    coverArt->setPixmap(image);
 }
 
 void DlgCoverArtFullSize::slotLoadTrack(TrackPointer pTrack) {

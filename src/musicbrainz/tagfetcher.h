@@ -6,7 +6,6 @@
 #include "musicbrainz/web/acoustidlookuptask.h"
 #include "musicbrainz/web/coverartarchiveimagetask.h"
 #include "musicbrainz/web/coverartarchivelinkstask.h"
-#include "musicbrainz/web/coverartarchivethumbnailstask.h"
 #include "musicbrainz/web/musicbrainzrecordingstask.h"
 #include "track/track_decl.h"
 #include "util/parented_ptr.h"
@@ -27,9 +26,19 @@ class TagFetcher : public QObject {
     void startFetch(
             TrackPointer pTrack);
 
-    void startFetchForCoverArt(const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
+    //This is called from dlgTagFetcher.
+    //This starts the initial task for to find the cover art links
+    //4 Possible cover art links fetched in this task.
+    //This can be >1200px-1200px-500px-250px image links.
+    void startFetchCoverArtLinks(const QUuid& albumReleaseId);
 
-    void fetchDesiredResolutionCoverArt(
+    //After the first task is done successfully.
+    //This is called automatically.
+    //This task starts to fetch the image.
+    //Link provided from preference option.
+    //After a success task, related label updated with cover art.
+    //If user presses apply, cover art downloaded and applied to the song.
+    void startFetchCoverArtImage(
             const QString& coverArtUrl);
 
   public slots:
@@ -39,7 +48,6 @@ class TagFetcher : public QObject {
     void resultAvailable(
             TrackPointer pTrack,
             const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
-    void coverArtUrlsAvailable(const QMap<QUuid, QList<QString>>& coverArtAllUrls);
     void fetchProgress(
             const QString& message);
     void numberOfRecordingsToFetch(int totalNumberOfRecordings);
@@ -50,8 +58,9 @@ class TagFetcher : public QObject {
             const QString& message,
             int code);
     void fetchedCoverUpdate(const QByteArray& coverInfo);
-    void coverArtThumbnailFetchAvailable(const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
     void coverArtImageFetchAvailable(const QByteArray& coverArtBytes);
+    void coverArtArchiveLinksAvailable(const QList<QString>& allUrls);
+    void coverArtLinkNotFound();
 
   private slots:
     void slotFingerprintReady();
@@ -78,9 +87,7 @@ class TagFetcher : public QObject {
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
 
-    void slotCoverArtArchiveLinksTaskSucceeded(const QMap<QUuid, QString>& coverArtThumbnailUrls);
-    void slotCoverArtArchiveLinksTaskSucceededLinks(
-            const QMap<QUuid, QList<QString>>& coverArtUrls);
+    void slotCoverArtArchiveLinksTaskSucceeded(const QList<QString>& allUrls);
     void slotCoverArtArchiveLinksTaskFailed(
             const mixxx::network::JsonWebResponse& response);
     void slotCoverArtArchiveLinksTaskAborted();
@@ -88,27 +95,23 @@ class TagFetcher : public QObject {
             QNetworkReply::NetworkError errorCode,
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
-    void slotCoverArtArchiveLinksTaskNotFound();
 
-    void slotCoverArtArchiveThumbnailsTaskSucceeded(
-            const QMap<QUuid, QByteArray>& smallThumbnailsBytes);
-    void slotCoverArtArchiveThumbnailsTaskFailed(
+    void slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverArtBytes);
+    void slotCoverArtArchiveImageTaskFailed(
             const mixxx::network::WebResponse& response,
             int errorCode,
             const QString& errorMessage);
-    void slotCoverArtArchiveThumbnailsTaskAborted();
-    void slotCoverArtArchiveThumbnailsTaskNetworkError(
+    void slotCoverArtArchiveImageTaskAborted();
+    void slotCoverArtArchiveImageTaskNetworkError(
             QNetworkReply::NetworkError errorCode,
             const QString& errorString,
             const mixxx::network::WebResponseWithContent& responseWithContent);
-
-    void slotCoverArtArchiveImageTaskSucceeded(const QByteArray& coverArtBytes);
 
   private:
     bool onAcoustIdTaskTerminated();
     bool onMusicBrainzTaskTerminated();
     bool onCoverArtArchiveLinksTaskTerminated();
-    bool onCoverArtArchiveThumbnailsTaskTerminated();
+    bool onCoverArtArchiveImageTaskTerminated();
 
     QNetworkAccessManager m_network;
 
@@ -119,8 +122,6 @@ class TagFetcher : public QObject {
     parented_ptr<mixxx::MusicBrainzRecordingsTask> m_pMusicBrainzTask;
 
     parented_ptr<mixxx::CoverArtArchiveLinksTask> m_pCoverArtArchiveLinksTask;
-
-    parented_ptr<mixxx::CoverArtArchiveThumbnailsTask> m_pCoverArtArchiveThumbnailsTask;
 
     parented_ptr<mixxx::CoverArtArchiveImageTask> m_pCoverArtArchiveImageTask;
 

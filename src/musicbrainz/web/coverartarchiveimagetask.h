@@ -18,6 +18,11 @@ class CoverArtArchiveImageTask : public network::WebTask {
     void succeeded(
             const QByteArray& coverArtImageBytes);
 
+    void failed(
+            const network::WebResponse& response,
+            int errorCode,
+            const QString& errorMessage);
+
   private:
     QNetworkReply* doStartNetworkRequest(
             QNetworkAccessManager* networkAccessManager,

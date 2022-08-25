@@ -41,11 +41,7 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void fetchTagFinished(
             TrackPointer pTrack,
             const QList<mixxx::musicbrainz::TrackRelease>& guessedTrackReleases);
-    void fetchCoverArtUrlFinished(const QMap<QUuid, QList<QString>>& coverArtAllUrls);
-    void fetchThumbnailFinished(const QMap<QUuid, QByteArray>& thumbnailBytes);
     void resultSelected();
-    //void coverArtResultSelected();
-    void fetchTagProgress(const QString&);
     void progressBarSetTotalSteps(int totalRecordingsFound);
     void progressBarSetCurrentStep();
     void slotNetworkResult(int httpStatus, const QString& app, const QString& message, int code);
@@ -53,7 +49,6 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
     void apply();
     void retry();
     void quit();
-    void fetchCoverArt();
     void slotNext();
     void slotPrev();
     void slotCoverFound(
@@ -62,17 +57,18 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
             const QPixmap& pixmap,
             mixxx::cache_key_t requestedCacheKey,
             bool coverInfoUpdated);
-    void updateFetchedCoverArtLayout(const QByteArray& thumbnailResultBytes);
-    void downloadCoverAndApply(const QByteArray& data);
+    void slotUpdateProgressBarMessage(const QString& message);
+    void slotUpdateStatusMessage(const QString& message);
+    void slotStartFetchCoverArt(const QList<QString>& allUrls);
+    void slotLoadBytesToLabel(const QByteArray& data);
+    void slotCoverArtLinkNotFound();
 
   private:
-    void loadCurrentTrackCover();
-    void switchToCoverArtFetcher();
     void loadTrackInternal(const TrackPointer& track);
     void updateStack();
-    void updateCoverFetcher();
     void addDivider(const QString& text, QTreeWidget* parent) const;
     void getCoverArt(const QString& url);
+    void loadCurrentTrackCover();
 
     UserSettingsPointer m_pConfig;
 
@@ -92,10 +88,6 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
 
     int m_progressBarStep;
 
-    QMap<QUuid, QByteArray> m_resultsThumbnails;
-
-    QMap<QUuid, QList<QString>> m_resultsCoverArtAllUrls;
-
     struct Data {
         Data()
                 : m_pending(true),
@@ -114,4 +106,6 @@ class DlgTagFetcher : public QDialog, public Ui::DlgTagFetcher {
         UnknownError,
     };
     NetworkResult m_networkResult;
+
+    QByteArray m_fetchedCoverArtByteArrays;
 };

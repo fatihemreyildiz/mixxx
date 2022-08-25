@@ -21,9 +21,10 @@ class DlgPrefLibrary : public DlgPreferencePage, public Ui::DlgPrefLibraryDlg  {
     };
 
     enum class CoverArtFetcherQuality : int {
-        Lowest = 0,
+        Low = 0,
         Medium = 1,
-        Highest = 2,
+        High = 2,
+        Highest = 3,
     };
 
     DlgPrefLibrary(
