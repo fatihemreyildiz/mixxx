@@ -442,7 +442,8 @@ void DlgTagFetcher::updateStack() {
     btnApply->setEnabled(true);
     btnRetry->setEnabled(false);
 
-    loadingProgressBar->setValue(loadingProgressBar->maximum());
+    QString updateStackMessage = tr("The results are ready to be applied");
+    statusMessage->setText(updateStackMessage);
     statusMessage->setVisible(true);
     loadingProgressBar->setVisible(false);
 
@@ -578,7 +579,7 @@ void DlgTagFetcher::slotLoadBytesToLabel(const QByteArray& data) {
     coverInfo.setImage();
 
     loadingProgressBar->setVisible(false);
-    QString coverArtMessage = tr("Cover art found  and it is ready to be applied.");
+    QString coverArtMessage = tr("Cover art found and it is ready to be applied.");
     statusMessage->setText(coverArtMessage);
 
     m_fetchedCoverArtByteArrays = data;
