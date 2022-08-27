@@ -580,6 +580,7 @@ void DlgTagFetcher::slotLoadBytesToLabel(const QByteArray& data) {
 
     loadingProgressBar->setVisible(false);
     QString coverArtMessage = tr("Cover art found and it is ready to be applied.");
+    statusMessage->setVisible(true);
     statusMessage->setText(coverArtMessage);
 
     m_fetchedCoverArtByteArrays = data;
