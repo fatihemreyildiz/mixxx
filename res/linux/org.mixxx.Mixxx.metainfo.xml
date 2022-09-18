@@ -96,7 +96,7 @@
   Do not edit it manually.
   -->
   <releases>
-    <release version="2.4.0" type="development" date="2022-08-29" timestamp="1661804811">
+    <release version="2.4.0" type="development" date="2022-09-07" timestamp="1662584120">
       <description>
  <p>
   Cover Art
@@ -414,6 +414,8 @@
    #4837
    #4864
    #4893
+   #10861
+   #10871
   </li>
  </ul>
  <p>
@@ -652,6 +654,8 @@
    #4589
    #1717
    #4852
+   #10835
+   #10843
   </li>
  </ul>
  <p>
@@ -978,6 +982,7 @@
    lp:1299035
    #4810
    #4901
+   #10858
   </li>
   <li>
    Use '---' instead of 'None' for empty slots to spot them easier
@@ -1023,6 +1028,7 @@
    lp1983764
    #4899
    #8817
+   #10868
   </li>
  </ul>
  <p>
@@ -1050,6 +1056,7 @@
    #4514
    #3550
    #4861
+   #10855
   </li>
   <li>
    Improve GitHub workflow continuous integration
@@ -1145,6 +1152,7 @@
    #4338
    #4709
    #4717
+   #10872
   </li>
   <li>
    Devendor libraries from the mixxx lib directory
@@ -1386,6 +1394,11 @@
    #4825
   </li>
   <li>
+   Replace Launchpad bugs by GitHub issues
+   #10850
+   #10865
+  </li>
+  <li>
    Misc. refactorings
    #3154
    #2870
@@ -1501,7 +1514,7 @@
    #4767
    #4797
    #4782
-   #4780
+   #4800
    #4791
    #4848
    #4856
@@ -1511,11 +1524,12 @@
    #4908
    #4903
    #8818
+   #4907
   </li>
  </ul>
 </description>
     </release>
-    <release version="2.3.4" type="development" date="2022-08-29" timestamp="1661804811">
+    <release version="2.3.4" type="development" date="2022-09-07" timestamp="1662584120">
       <description>
  <ul>
   <li>
@@ -1528,9 +1542,18 @@
    lp:1980658
   </li>
   <li>
-   Numark DJ2GO2 Touch: Fix  sliders and knobs
+   Numark DJ2GO2: Fix  sliders and knobs
    #4835
    lp:1948596
+  </li>
+  <li>
+   Numark DJ2Go2: support HotCue clear with pad
+   #10841
+  </li>
+  <li>
+   Numark DJ2Go2: Fix inverted tempo fader
+   #10852
+   #10586
   </li>
   <li>
    Potmeters: Add support for arbitrary maximums in 7-/14-bit handlers from controller scripts
@@ -1568,6 +1591,29 @@
   <li>
    Cover Art: Fix picking wrong cover file, when track file name contains extra dots
    #4909
+  </li>
+  <li>
+   Respect MusicBrainz rate limits
+   #10874
+   #10795
+  </li>
+ </ul>
+ <p>
+  Packaging
+ </p>
+ <ul>
+  <li>
+   Fix compatibility with FFmpeg 5.1 and require FFmpeg v4.1.9
+   #10862
+   #10866
+  </li>
+  <li>
+   Fix GCC 12.2.0 compatibility
+   #10863
+  </li>
+  <li>
+   Improve CMake 3.24 compatibility
+   #10864
   </li>
  </ul>
 </description>

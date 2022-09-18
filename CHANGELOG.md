@@ -145,6 +145,8 @@
   [#4837](https://github.com/mixxxdj/mixxx/pull/4837)
   [#4864](https://github.com/mixxxdj/mixxx/pull/4864)
   [#4893](https://github.com/mixxxdj/mixxx/pull/4893)
+  [#10861](https://github.com/mixxxdj/mixxx/pull/10861)
+  [#10871](https://github.com/mixxxdj/mixxx/pull/10871)
 
 ### Sync
 
@@ -293,6 +295,8 @@
   [#4589](https://github.com/mixxxdj/mixxx/pull/4589)
   [#1717](https://github.com/mixxxdj/mixxx/pull/1717)
   [#4852](https://github.com/mixxxdj/mixxx/pull/4852)
+  [#10835](https://github.com/mixxxdj/mixxx/pull/10835)
+  [#10843](https://github.com/mixxxdj/mixxx/pull/10843)
 
 ### Controllers
 
@@ -438,6 +442,7 @@
   [lp:1299035](https://bugs.launchpad.net/mixxx/+bug/1299035)
   [#4810](https://github.com/mixxxdj/mixxx/pull/4810)
   [#4901](https://github.com/mixxxdj/mixxx/pull/4901)
+  [#10858](https://github.com/mixxxdj/mixxx/pull/10858)
 * Use '---' instead of 'None' for empty slots to spot them easier [#4469](https://github.com/mixxxdj/mixxx/pull/4469)
 * EngineFilterDelay: clamp wrong delay values [#4869](https://github.com/mixxxdj/mixxx/pull/4869)
 * Effect refactoring: Effect chain saving/loading, parameter hiding/rearrangement, effect preferences overhaul
@@ -472,6 +477,7 @@
   [#4884](https://github.com/mixxxdj/mixxx/pull/4884) [lp:1983789](https://bugs.launchpad.net/mixxx/+bug/1983789) [lp1983764](https://bugs.launchpad.net/mixxx/+bug/1983764)
   [#4899](https://github.com/mixxxdj/mixxx/pull/4899)
   [#8817](https://github.com/mixxxdj/mixxx/pull/8817)
+  [#10868](https://github.com/mixxxdj/mixxx/pull/10868)
 
 ### Other
 
@@ -495,6 +501,7 @@
   [#4514](https://github.com/mixxxdj/mixxx/pull/4514)
   [#3550](https://github.com/mixxxdj/mixxx/pull/3550)
   [#4861](https://github.com/mixxxdj/mixxx/pull/4861)
+  [#10855](https://github.com/mixxxdj/mixxx/pull/10855)
 * Improve GitHub workflow continuous integration
   [#2937](https://github.com/mixxxdj/mixxx/pull/2937)
   [#3041](https://github.com/mixxxdj/mixxx/pull/3041)
@@ -567,6 +574,7 @@
   [#4338](https://github.com/mixxxdj/mixxx/pull/4338)
   [#4709](https://github.com/mixxxdj/mixxx/pull/4709)
   [#4717](https://github.com/mixxxdj/mixxx/pull/4717)
+  [#10872](https://github.com/mixxxdj/mixxx/pull/10872)
 * Devendor libraries from the mixxx lib directory
   [#4201](https://github.com/mixxxdj/mixxx/pull/4201)
   [#4202](https://github.com/mixxxdj/mixxx/pull/4202)
@@ -707,6 +715,9 @@
 * Preferences > Effects: Fix Tab key navigation / UX [#4702](https://github.com/mixxxdj/mixxx/pull/4702) [lp:1948535](https://bugs.launchpad.net/mixxx/+bug/1948535)
 * Switch to C++20 [#4832](https://github.com/mixxxdj/mixxx/pull/4832) [#4803](https://github.com/mixxxdj/mixxx/pull/4803)
 * Windows builds: Sign binary and installer with timestamp and sha256 [#4824](https://github.com/mixxxdj/mixxx/pull/4824) [#4825](https://github.com/mixxxdj/mixxx/pull/4825)
+* Replace Launchpad bugs by GitHub issues
+  [#10850](https://github.com/mixxxdj/mixxx/pull/10850)
+  [#10865](https://github.com/mixxxdj/mixxx/pull/10865)
 * Misc. refactorings
   [#3154](https://github.com/mixxxdj/mixxx/pull/3154)
   [#2870](https://github.com/mixxxdj/mixxx/pull/2870)
@@ -822,7 +833,7 @@
   [#4767](https://github.com/mixxxdj/mixxx/pull/4767)
   [#4797](https://github.com/mixxxdj/mixxx/pull/4797)
   [#4782](https://github.com/mixxxdj/mixxx/pull/4782)
-  [#4780](https://github.com/mixxxdj/mixxx/pull/4800)
+  [#4800](https://github.com/mixxxdj/mixxx/pull/4800)
   [#4791](https://github.com/mixxxdj/mixxx/pull/4791)
   [#4848](https://github.com/mixxxdj/mixxx/pull/4848)
   [#4856](https://github.com/mixxxdj/mixxx/pull/4856)
@@ -832,12 +843,15 @@
   [#4908](https://github.com/mixxxdj/mixxx/pull/4908)
   [#4903](https://github.com/mixxxdj/mixxx/pull/4903)
   [#8818](https://github.com/mixxxdj/mixxx/pull/8818)
+  [#4907](https://github.com/mixxxdj/mixxx/pull/4907)
 
 ## [2.3.4](https://launchpad.net/mixxx/+milestone/2.3.4) (unreleased)
 
 * Controller Preferences: Fix some usability issues [#10821](https://github.com/mixxxdj/mixxx/pull/10821)
 * Track Properties: show 'date added' as local time [#4838](https://github.com/mixxxdj/mixxx/pull/4838) [lp:1980658](https://bugs.launchpad.net/mixxx/+bug/1980658)
-* Numark DJ2GO2 Touch: Fix  sliders and knobs [#4835](https://github.com/mixxxdj/mixxx/pull/4835) [lp:1948596](https://bugs.launchpad.net/mixxx/+bug/1948596)
+* Numark DJ2GO2: Fix  sliders and knobs [#4835](https://github.com/mixxxdj/mixxx/pull/4835) [lp:1948596](https://bugs.launchpad.net/mixxx/+bug/1948596)
+* Numark DJ2Go2: support HotCue clear with pad [#10841](https://github.com/mixxxdj/mixxx/pull/10841)
+* Numark DJ2Go2: Fix inverted tempo fader [#10852](https://github.com/mixxxdj/mixxx/pull/10852) [#10586](https://github.com/mixxxdj/mixxx/issues/10586)
 * Potmeters: Add support for arbitrary maximums in 7-/14-bit handlers from controller scripts [#4495](https://github.com/mixxxdj/mixxx/pull/4495)
 * Shade: Fix library sidebar splitter glitch [#4828](https://github.com/mixxxdj/mixxx/pull/4828) [lp:1979823](https://bugs.launchpad.net/mixxx/+bug/1979823)
 * MacOS builds: Perform ad-hoc signing of macOS bundle in Pull request and personal repositories [#4774](https://github.com/mixxxdj/mixxx/pull/4774)
@@ -847,6 +861,13 @@
 * EQ preferences: properly restore 'One EQ for all decks' setting [#4886](https://github.com/mixxxdj/mixxx/pull/4886)
 * MC7000: Fix off-by-one indexing in the controller script [#4902](https://github.com/mixxxdj/mixxx/pull/4902)
 * Cover Art: Fix picking wrong cover file, when track file name contains extra dots [#4909](https://github.com/mixxxdj/mixxx/pull/4909)
+* Respect MusicBrainz rate limits [#10874](https://github.com/mixxxdj/mixxx/pull/10874) [#10795](https://github.com/mixxxdj/mixxx/issues/10795)
+
+### Packaging
+
+* Fix compatibility with FFmpeg 5.1 and require FFmpeg v4.1.9 [#10862](https://github.com/mixxxdj/mixxx/pull/10862) [#10866](https://github.com/mixxxdj/mixxx/pull/10866)
+* Fix GCC 12.2.0 compatibility [#10863](https://github.com/mixxxdj/mixxx/pull/10863)
+* Improve CMake 3.24 compatibility [#10864](https://github.com/mixxxdj/mixxx/pull/10864)
 
 ## [2.3.3](https://launchpad.net/mixxx/+milestone/2.3.3) (2022-06-21)
 
