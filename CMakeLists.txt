@@ -603,6 +603,7 @@ add_library(mixxx-lib STATIC EXCLUDE_FROM_ALL
   src/effects/backends/builtin/loudnesscontoureffect.cpp
   src/effects/backends/builtin/metronomeeffect.cpp
   src/effects/backends/builtin/moogladder4filtereffect.cpp
+  src/effects/backends/builtin/distortioneffect.cpp
   src/effects/backends/builtin/parametriceqeffect.cpp
   src/effects/backends/builtin/phasereffect.cpp
   src/effects/backends/builtin/pitchshifteffect.cpp
@@ -1215,7 +1216,7 @@ if (INFO_VECTORIZE)
     elseif(LLVM_CLANG)
         target_compile_options(mixxx-lib PUBLIC -Rpass=loop-vectorize)
     else()
-        message(STATUS "INFO_VECTORIZE not implemented for this compliler.")
+        message(STATUS "INFO_VECTORIZE not implemented for this compiler.")
     endif()
 endif()
 
